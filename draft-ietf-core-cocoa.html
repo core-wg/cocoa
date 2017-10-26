@@ -1,0 +1,735 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head profile="http://www.w3.org/2006/03/hcard http://dublincore.org/documents/2008/08/04/dc-html/">
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+
+  <title>CoAP Simple Congestion Control/Advanced</title>
+
+  
+<style type="text/css">/*<![CDATA[*/
+@viewport {
+  zoom: 1.0;
+  width: extend-to-zoom;
+}
+@-ms-viewport {
+  width: extend-to-zoom;
+  zoom: 1.0;
+}
+
+@media screen and (min-width: 1024px) {
+  ul.toc, #rfc\.toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 525px);
+    width: 300px;
+    z-index: 1;
+  }
+  #rfc\.toc {
+    top: 15px;
+  }
+  ul.toc {
+    top: 80px;
+    overflow: auto;
+  }
+
+  body {
+    padding-right: 350px;
+  }
+}
+
+body {
+  font: 15px "Helvetica Neue",Helvetica,Arial,sans-serif;
+  color: #333;
+  font-size-adjust: 0.5;
+  line-height: 130%;
+  margin: 25px auto;
+  max-width: 724px;
+}
+
+.title, .filename, h1, h2, h3, h4 {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-size-adjust: 0.5;
+  font-weight: 500;
+  color: #333;
+  line-height: 100%;
+  margin: 0.8em 0 0.3em;
+}
+.title { font-size: 36px; }
+h1 { font-size: 30px; }
+h2 { font-size: 24px; }
+h3, h4 { font-size: 18px; }
+h1 a[href], h2 a[href], h3 a[href], h4 a[href] {
+  color: #333;
+}
+
+ul.toc li {
+  list-style: none;
+  text-indent: -2.5em;
+  padding-left: 2.5em;
+  padding-bottom: 5px;
+  margin: 0;
+}
+ul.toc ul {
+  margin: 0;
+}
+/* xml2rfc nests ul directly inside ul which messes with the style badly */
+ul.toc, ul.toc>ul, ul.toc ul>ul {
+  margin: 0 0 0 1.5em;
+}
+
+table {
+  margin-left: 0em;
+  border-collapse: collapse;
+}
+th {
+  text-align: left;
+  border-bottom: 2px solid #ddd;
+}
+td {
+  border-top: 1px solid #ddd;
+  vertical-align: top;
+}
+tr:nth-child(2n+1) > td,
+tr:nth-child(2n+1) > th {
+  background-color: #f9f9f9;
+}
+td.reference {
+  max-width: 200px;
+  border-top: none;
+  padding-right: 1em;
+}
+.right {
+  text-align: right;
+}
+
+
+table.header {
+  width: 100%;
+}
+table.header td {
+  border: none;
+  background-color: transparent;
+  color: black;
+}
+.filename {
+  color: rgb(119, 119, 119);
+  font-size: 23px;
+  font-weight: normal;
+  height: auto;
+  line-height: 100%;
+}
+#rfc\.abstract+p {
+  font-size: 20px;
+  font-weight: 300;
+  line-height: 130%;
+}
+
+samp, tt, code, pre {
+  font: 11pt consolas, monospace;
+  font-size-adjust: none;
+}
+pre {
+  background-color: #eee;
+  border: 1px solid #ddd;
+  overflow-x: auto;
+  padding: 5px;
+  margin: 5px;
+}
+.figure {
+  font-style: italic;
+  margin: 0 1.5em;
+}
+
+address {
+  margin: 10px 0 0;
+}
+.vcard {
+  font-style: normal;
+}
+.vcardline {
+  display: block;
+}
+.vcardline .fn {
+  font-weight: bold;
+}
+.vcardline .hidden {
+  display: none;
+}
+
+dl {
+  margin-left: 1em;
+}
+dl.dl-horizontal: {
+  margin-left: 0;
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl.nohang > dt {
+  float: none;
+}
+dl > dd {
+  margin-bottom: .5em;
+}
+dl.compact > dd {
+  margin-bottom: 0em;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0em;
+}
+ul.empty {
+  list-style-type: none;
+}
+ul.empty li {
+  margin-top: .5em;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+}
+
+a {
+  text-decoration: none;
+}
+a[href] {
+  color: #2a6496;
+}
+a[href]:hover {
+  background-color: #eee;
+}
+
+ol, ul, li, p {
+  padding: 0;
+  margin: 0.5em 0 0.5em 2em;
+}
+li, p {
+  margin-left: 0;
+}
+address {
+  font-style: normal;
+}
+
+.github-fork-ribbon-wrapper {
+  display: none;
+}
+@media screen and (min-width: 800px) {
+  /* "Fork me on GitHub" CSS ribbon based on
+   * https://github.com/simonwhitaker/github-fork-ribbon-css
+   */
+  .github-fork-ribbon {
+    position: absolute;
+    padding: 2px 0;
+    background-color: #a00;
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.15));
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.5);
+    font: 700 12px "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+    pointer-events: auto;
+
+    top: 38px;
+    right: -45px;
+
+    transform: rotate(45deg);
+  }
+
+  .github-fork-ribbon a[href],
+  .github-fork-ribbon a[href]:hover {
+    color: #fff;
+    background-color: transparent;
+    text-decoration: none;
+    text-shadow: 0 -1px rgba(0, 0, 0, 0.5);
+    text-align: center;
+
+    width: 190px;
+    line-height: 18px;
+
+    display: inline-block;
+    padding: 2px 0;
+
+    border: 1.5px dotted #fff;
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .github-fork-ribbon-wrapper {
+    display: block;
+    width: 130px;
+    height: 130px;
+    position: absolute;
+    overflow: hidden;
+    top: 0; right: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+}
+@media screen and (min-width: 1000px) {
+  .github-fork-ribbon-wrapper {
+    position: fixed;
+  }
+  /*]]>*/</style>
+
+
+  <link href="#rfc.toc" rel="Contents">
+<link href="#rfc.section.1" rel="Chapter" title="1 Introduction">
+<link href="#rfc.section.1.1" rel="Chapter" title="1.1 Terminology">
+<link href="#rfc.section.2" rel="Chapter" title="2 Context">
+<link href="#rfc.section.3" rel="Chapter" title="3 Area of Applicability">
+<link href="#rfc.section.4" rel="Chapter" title="4 Advanced CoAP Congestion Control: RTO Estimation">
+<link href="#rfc.section.4.1" rel="Chapter" title="4.1 Blind RTO Estimate">
+<link href="#rfc.section.4.2" rel="Chapter" title="4.2 Measured RTO Estimate">
+<link href="#rfc.section.4.2.1" rel="Chapter" title="4.2.1 Modifications to the algorithm of RFC 6298">
+<link href="#rfc.section.4.2.2" rel="Chapter" title="4.2.2 Discussion">
+<link href="#rfc.section.4.3" rel="Chapter" title="4.3 Lifetime, Aging">
+<link href="#rfc.section.5" rel="Chapter" title="5 Advanced CoAP Congestion Control: Non-Confirmables">
+<link href="#rfc.section.5.1" rel="Chapter" title="5.1 Discussion">
+<link href="#rfc.section.6" rel="Chapter" title="6 IANA Considerations">
+<link href="#rfc.section.7" rel="Chapter" title="7 Security Considerations">
+<link href="#rfc.references" rel="Chapter" title="8 References">
+<link href="#rfc.references.1" rel="Chapter" title="8.1 Normative References">
+<link href="#rfc.references.2" rel="Chapter" title="8.2 Informative References">
+<link href="#rfc.appendix.A" rel="Chapter" title="A Supporting evidence">
+<link href="#rfc.appendix.A.1" rel="Chapter" title="A.1 Older versions of the draft and improvement">
+<link href="#rfc.appendix.A.2" rel="Chapter" title="A.2 References">
+<link href="#rfc.acknowledgements" rel="Chapter">
+<link href="#rfc.authors" rel="Chapter">
+
+
+  <meta name="generator" content="xml2rfc version 2.8.2 - https://tools.ietf.org/tools/xml2rfc" />
+  <link rel="schema.dct" href="http://purl.org/dc/terms/" />
+
+  <meta name="dct.creator" content="Bormann, C., Betzler, A., Gomez, C., and I. Demirkol" />
+  <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-core-cocoa-latest" />
+  <meta name="dct.issued" scheme="ISO8601" content="2017-10-26" />
+  <meta name="dct.abstract" content="The CoAP protocol needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance." />
+  <meta name="description" content="The CoAP protocol needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance." />
+
+</head>
+
+<body>
+
+  <table class="header">
+    <tbody>
+    
+    	<tr>
+<td class="left">CoRE Working Group</td>
+<td class="right">C. Bormann</td>
+</tr>
+<tr>
+<td class="left">Internet-Draft</td>
+<td class="right">Universit&#228;t Bremen TZI</td>
+</tr>
+<tr>
+<td class="left">Intended status: Informational</td>
+<td class="right">A. Betzler</td>
+</tr>
+<tr>
+<td class="left">Expires: April 29, 2018</td>
+<td class="right">Fundaci&#243; i2CAT</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td class="right">C. Gomez</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td class="right">I. Demirkol</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td class="right">Universitat Politecnica de Catalunya/Fundacio i2CAT</td>
+</tr>
+<tr>
+<td class="left"></td>
+<td class="right">October 26, 2017</td>
+</tr>
+
+    	
+    </tbody>
+  </table>
+
+  <p class="title">CoAP Simple Congestion Control/Advanced<br />
+  <span class="filename">draft-ietf-core-cocoa-latest</span></p>
+  
+  <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
+<p>The CoAP protocol needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance.</p>
+<p>This specification defines some simple advanced CoRE Congestion Control mechanisms, Simple CoCoA.  It is making use of input from simulations and experiments in real networks.</p>
+<h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
+<p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
+<p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
+<p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
+<p>This Internet-Draft will expire on April 29, 2018.</p>
+<h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
+<p>Copyright (c) 2017 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
+<p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
+
+  
+  <hr class="noprint" />
+  <h1 class="np" id="rfc.toc"><a href="#rfc.toc">Table of Contents</a></h1>
+  <ul class="toc">
+
+  	<li>1.   <a href="#rfc.section.1">Introduction</a>
+</li>
+<ul><li>1.1.   <a href="#rfc.section.1.1">Terminology</a>
+</li>
+</ul><li>2.   <a href="#rfc.section.2">Context</a>
+</li>
+<li>3.   <a href="#rfc.section.3">Area of Applicability</a>
+</li>
+<li>4.   <a href="#rfc.section.4">Advanced CoAP Congestion Control: RTO Estimation</a>
+</li>
+<ul><li>4.1.   <a href="#rfc.section.4.1">Blind RTO Estimate</a>
+</li>
+<li>4.2.   <a href="#rfc.section.4.2">Measured RTO Estimate</a>
+</li>
+<ul><li>4.2.1.   <a href="#rfc.section.4.2.1">Modifications to the algorithm of RFC 6298</a>
+</li>
+<li>4.2.2.   <a href="#rfc.section.4.2.2">Discussion</a>
+</li>
+</ul><li>4.3.   <a href="#rfc.section.4.3">Lifetime, Aging</a>
+</li>
+</ul><li>5.   <a href="#rfc.section.5">Advanced CoAP Congestion Control: Non-Confirmables</a>
+</li>
+<ul><li>5.1.   <a href="#rfc.section.5.1">Discussion</a>
+</li>
+</ul><li>6.   <a href="#rfc.section.6">IANA Considerations</a>
+</li>
+<li>7.   <a href="#rfc.section.7">Security Considerations</a>
+</li>
+<li>8.   <a href="#rfc.references">References</a>
+</li>
+<ul><li>8.1.   <a href="#rfc.references.1">Normative References</a>
+</li>
+<li>8.2.   <a href="#rfc.references.2">Informative References</a>
+</li>
+</ul><li>Appendix A.   <a href="#rfc.appendix.A">Supporting evidence</a>
+</li>
+<ul><li>A.1.   <a href="#rfc.appendix.A.1">Older versions of the draft and improvement</a>
+</li>
+<li>A.2.   <a href="#rfc.appendix.A.2">References</a>
+</li>
+</ul><li><a href="#rfc.acknowledgements">Acknowledgements</a>
+</li>
+<li><a href="#rfc.authors">Authors' Addresses</a>
+</li>
+
+
+  </ul>
+
+  <h1 id="rfc.section.1">
+<a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a>
+</h1>
+<p id="rfc.section.1.p.1">The CoAP protocol needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance.</p>
+<p id="rfc.section.1.p.2">The present specification defines such an advanced CoRE Congestion Control mechanism, with the goal of improving performance while retaining safety as well as the simplicity that is appropriate for constrained devices.  Hence, we are calling this mechanism Simple CoCoA (Congestion Control/Advanced).</p>
+<p id="rfc.section.1.p.3">In the Internet, congestion control is typically implemented in a way that it can be introduced or upgraded unilaterally.  Still, a new congestion control scheme must not be introduced lightly.  To ensure that the new scheme is not posing a danger to the network, considerable work has been done on simulations and experiments in real networks.  Some of this work will be mentioned in &#8220;Discussion&#8221; subsections in the following sections; an overview is given in <a href="#evidence" class="xref">Appendix A</a>.  Extended rationale for this specification can also be found in the historical Internet-Drafts <a href="#I-D.bormann-core-congestion-control" class="xref">[I-D.bormann-core-congestion-control]</a> and <a href="#I-D.eggert-core-congestion-control" class="xref">[I-D.eggert-core-congestion-control]</a>, as well as in the minutes of the IETF 84 CoRE WG meetings.</p>
+<h1 id="rfc.section.1.1">
+<a href="#rfc.section.1.1">1.1.</a> <a href="#terminology" id="terminology">Terminology</a>
+</h1>
+<p id="rfc.section.1.1.p.1">This specification uses terms from <a href="#RFC7252" class="xref">[RFC7252]</a>.  In addition, it defines the following terminology:</p>
+<p></p>
+
+<dl>
+<dt>Initiator:</dt>
+<dd style="margin-left: 8">The endpoint that sends the message that initiates an exchange.  E.g., the party that sends a confirmable message, or a non-confirmable message conveying a request.</dd>
+</dl>
+<p id="rfc.section.1.1.p.3">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in BCP 14 <a href="#RFC2119" class="xref">[RFC2119]</a> <a href="#RFC8174" class="xref">[RFC8174]</a> when, and only when, they appear in all capitals, as shown here.</p>
+<p id="rfc.section.1.1.p.4">(Note that the present document is itself informational, but it is discussing normative statements about behavior that makes the congestion control scheme work in a safe manner.)</p>
+<p id="rfc.section.1.1.p.5">The term &#8220;byte&#8221;, abbreviated by &#8220;B&#8221;, is used in its now customary sense as a synonym for &#8220;octet&#8221;.</p>
+<h1 id="rfc.section.2">
+<a href="#rfc.section.2">2.</a> <a href="#context" id="context">Context</a>
+</h1>
+<p id="rfc.section.2.p.1">In the definition of the CoAP protocol <a href="#RFC7252" class="xref">[RFC7252]</a>, an approach was taken that includes a very simple basic scheme (lock-step with the number of parallel exchanges usually limited to 1) in the base specification together with performance-enhancing advanced mechanisms.</p>
+<p id="rfc.section.2.p.2">The present specification is based on the approved text in the <a href="#RFC7252" class="xref">[RFC7252]</a> base specification.  It is making use of the text that permits advanced congestion control mechanisms and allows them to change protocol parameters, including NSTART and the binary exponential backoff mechanism.  Note that Section 4.8 of <a href="#RFC7252" class="xref">[RFC7252]</a> limits the leeway that implementations have in changing the CoRE protocol parameters.</p>
+<p id="rfc.section.2.p.3">The present specification also assumes that, outside of exchanges, non-confirmable messages can only be used at a limited rate without an advanced congestion control mechanism (this is mainly relevant for <a href="#RFC7641" class="xref">[RFC7641]</a>).  It is also intended to address the <a href="#RFC8085" class="xref">[RFC8085]</a> guideline about combining congestion control state for a destination; and to clarify its meaning for CoAP using the definition of an endpoint.</p>
+<p id="rfc.section.2.p.4">The present specification does not address multicast or dithering beyond basic retransmission dithering.</p>
+<h1 id="rfc.section.3">
+<a href="#rfc.section.3">3.</a> <a href="#area-of-applicability" id="area-of-applicability">Area of Applicability</a>
+</h1>
+<p id="rfc.section.3.p.1">The present algorithm is intended to be generally applicable.  The objective is to be &#8220;better&#8221; than default CoAP congestion control in a number of characteristics, including achievable goodput for a given offered load, latency, and recovery from bursts, while providing more predictable stress to the network and the same level of safety from catastrophic congestion.  It does require three state variables per scope plus the state needed to do RTT measurements, so it may not be applicable to the most constrained devices (class 1 as per <a href="#RFC7228" class="xref">[RFC7228]</a>).</p>
+<p id="rfc.section.3.p.2">The scope of each instance of the algorithm in the current set of evaluations has been the five-tuple, i.e., CoAP + endpoint (transport address) for Initiator and Responder.  Potential applicability to larger scopes needs to be examined.</p>
+<h1 id="rfc.section.4">
+<a href="#rfc.section.4">4.</a> <a href="#rto" id="rto">Advanced CoAP Congestion Control: RTO Estimation</a>
+</h1>
+<p id="rfc.section.4.p.1">For an initiator that plans to make multiple requests to one destination endpoint, it may be worthwhile to make RTT measurements in order to obtain a better RTO estimation than that implied by the default initial timeout of 2 to 3&#160;s.  This is based on the usual algorithms for RTO estimation <a href="#RFC6298" class="xref">[RFC6298]</a>, with appropriately extended default/base values, as proposed in <a href="#mod" class="xref">Section 4.2.1</a>.  Note that such a mechanism must, during idle periods, decay RTO estimates that are shorter or longer than the basic RTO estimate back to the basic RTO estimate, until fresh measurements become available again, as proposed in <a href="#aging" class="xref">Section 4.3</a>.</p>
+<p id="rfc.section.4.p.2">One important consideration not relevant for TCP is the fact that a CoAP round-trip may include application processing time, which may be hard to predict, and may differ between different resources available at the same endpoint.  Also, for communications with networks of constrained devices that apply radio duty cycling, large and variable round-trip times are likely to be observed.  Servers will only trigger their early ACKs (with a non-piggybacked response to be sent later) based on the default timers, e.g. after 1&#160;s. A client that has arrived at a RTO estimate shorter than 1&#160;s SHOULD therefore use a larger backoff factor for retransmissions to avoid expending all of its retransmissions in the default interval of 2 to 3&#160;s.  A proposal for a mechanism with variable backoff factors is presented in <a href="#mod" class="xref">Section 4.2.1</a>.  </p>
+<p id="rfc.section.4.p.3">It may also be worthwhile to do RTT estimates not just based on information measured from a single destination endpoint, but also based on entire hosts (IP addresses) and/or complete prefixes (e.g., maintain an RTT estimate for a whole /64).  The exact way this can be used to reduce the amount of state in an initiator is for further study.</p>
+<h1 id="rfc.section.4.1">
+<a href="#rfc.section.4.1">4.1.</a> <a href="#blind-rto-estimate" id="blind-rto-estimate">Blind RTO Estimate</a>
+</h1>
+<p id="rfc.section.4.1.p.1">The initial RTO estimate for an endpoint is set to 2 seconds (the initial RTO estimate is used as the initial value for both E_weak_ and E_strong_ below).</p>
+<p id="rfc.section.4.1.p.2">If only the initial RTO estimate is available, the RTO estimate for each of up to NSTART exchanges started in parallel is set to 2&#160;s times the number of parallel exchanges, e.g. if two exchanges are already running, the initial RTO estimate for an additional exchange is 6&#160;seconds.</p>
+<h1 id="rfc.section.4.2">
+<a href="#rfc.section.4.2">4.2.</a> <a href="#measured-rto-estimate" id="measured-rto-estimate">Measured RTO Estimate</a>
+</h1>
+<p id="rfc.section.4.2.p.1">The RTO estimator runs two copies of the algorithm defined in <a href="#RFC6298" class="xref">[RFC6298]</a>, as modified in <a href="#mod" class="xref">Section 4.2.1</a>: One copy for exchanges that complete on initial transmissions (the &#8220;strong estimator&#8221;, E_strong_), and one copy for exchanges that have run into retransmissions, where only the first two retransmissions are considered (the &#8220;weak estimator&#8221;, E_weak_).  For the latter, there is some ambiguity whether a response is based on the initial transmission or the retransmissions.  For the purposes of the weak estimator, the time from the initial transmission counts.  Responses obtained after the third retransmission are not used to update an estimator.</p>
+<p id="rfc.section.4.2.p.2">The overall RTO estimate is an exponentially weighted moving average (alpha = 0.5 and 0.25, respectively) computed of the strong and the weak estimator, which is evolved after each contribution to the weak estimator (1) or to the strong estimator (2), from the estimator that made the most recent contribution:</p>
+<p></p>
+
+<ul class="empty"><li>RTO := 0.25 * E_weak_ + 0.75 * RTO  (1)</li></ul>
+<p></p>
+
+<ul class="empty"><li>RTO := 0.5 * E_strong_ + 0.5 * RTO  (2)</li></ul>
+<p id="rfc.section.4.2.p.5">(Splitting this update into the two cases avoids making the contribution of the weak estimator too big in naturally lossy networks.)</p>
+<h1 id="rfc.section.4.2.1">
+<a href="#rfc.section.4.2.1">4.2.1.</a> <a href="#mod" id="mod">Modifications to the algorithm of RFC 6298</a>
+</h1>
+<p id="rfc.section.4.2.1.p.1">This subsection presents three modifications that must be applied to the algorithm of <a href="#RFC6298" class="xref">[RFC6298]</a> as per this document.  The first two recommend new parameter settings.  The third one is the variable backoff factor mechanism.</p>
+<p id="rfc.section.4.2.1.p.2">The initial value for each of the two RTO estimators is 2 s.</p>
+<p id="rfc.section.4.2.1.p.3">For the weak estimator, the factor K (the RTT variance multiplier) is set to 1 instead of 4.  This is necessary to avoid a strong increase of the RTO in the case that the RTTVAR value is very large, which may be the case if a weak RTT measurement is obtained after one or more retransmissions.</p>
+<p id="rfc.section.4.2.1.p.4">If an RTO estimation is lower than 1 s or higher than 3 s, instead of applying a binary backoff factor in both cases, a variable backoff factor is used. For RTO estimations below 1 s, the RTO for a retransmission is multiplied by 3, while for estimations above 3 s, the RTO is multiplied only by 1.5 (this updated choice of numbers to be verified by more simulations).  This helps to avoid that exchanges with small initial RTOs use up all retransmissions in a short interval of time and exchanges with large initial RTOs may not be able to carry out all retransmissions within MAX_TRANSMIT_WAIT (93&#160;s).</p>
+<p id="rfc.section.4.2.1.p.5">The binary exponential backoff is truncated at 32 seconds.  Similar to the way retransmissions are handled in the base specification, they are dithered between 1 x RTO and ACK_RANDOM_FACTOR x RTO.</p>
+<h1 id="rfc.section.4.2.2">
+<a href="#rfc.section.4.2.2">4.2.2.</a> <a href="#discussion" id="discussion">Discussion</a>
+</h1>
+<p id="rfc.section.4.2.2.p.1">In contrast to <a href="#RFC6298" class="xref">[RFC6298]</a>, this algorithm attempts to make use of ambiguous information from retransmissions.  This is motivated by the high non-congestion loss rates expected in constrained node networks, and the need to update the RTO estimators even in the presence of loss.  This approach appears to contravene the mandate in Section 3.1.1 of <a href="#RFC8085" class="xref">[RFC8085]</a> that &#8220;latency samples MUST NOT be derived from ambiguous transactions&#8221;.  However, those samples are not simply combined into the strong estimator, but are used to correct the limited knowledge that can be gained from the strong RTT measurements by employing an additional weak estimator.  Evidence that has been collected from experiments appears to support that the overall effect of using this data in the way described is beneficial (<a href="#evidence" class="xref">Appendix A</a>).</p>
+<p id="rfc.section.4.2.2.p.2">Some evaluation has been done on earlier versions of this specification <a href="#Betzler2013" class="xref">[Betzler2013]</a>.  A more recent (and more comprehensive) reference is <a href="#Betzler2015" class="xref">[Betzler2015]</a>.</p>
+<h1 id="rfc.section.4.3">
+<a href="#rfc.section.4.3">4.3.</a> <a href="#aging" id="aging">Lifetime, Aging</a>
+</h1>
+<p id="rfc.section.4.3.p.1">The state of the RTO estimators for an endpoint SHOULD be kept as long as possible.  If other state is kept for the endpoint (such as a DTLS connection), it is very strongly RECOMMENDED to keep the RTO state alive at least as long as this other state.  It MUST be kept for at least 255&#160;s.</p>
+<p id="rfc.section.4.3.p.2">If an estimator has a value that is lower than 1 s, and it is left without further update for 16 times its current value, the RTO estimate is doubled.  If an estimator has a value that is higher than 3 s, and it is left without further update for 4 times its current value, the RTO estimate is set to be</p>
+<p></p>
+
+<ul class="empty"><li>RTO := 1 s + (0.5 * RTO)</li></ul>
+<p id="rfc.section.4.3.p.4">(Note that, instead of running a timer, it is possible to implement these RTO aging calculations cumulatively at the time the estimator is used next.)</p>
+<h1 id="rfc.section.5">
+<a href="#rfc.section.5">5.</a> <a href="#advanced-coap-congestion-control-non-confirmables" id="advanced-coap-congestion-control-non-confirmables">Advanced CoAP Congestion Control: Non-Confirmables</a>
+</h1>
+<p id="rfc.section.5.p.1">A CoAP endpoint MUST NOT send non-confirmables to another CoAP endpoint at a rate higher than defined by this document.  Independent of any congestion control mechanisms, a CoAP endpoint can always send non-confirmables if their rate does not exceed 1&#160;B/s.</p>
+<p id="rfc.section.5.p.2">Non-confirmables that form part of exchanges are governed by the rules for exchanges.</p>
+<p id="rfc.section.5.p.3">Non-confirmables outside exchanges (e.g., <a href="#RFC7641" class="xref">[RFC7641]</a> notifications sent as non-confirmables) are governed by the following rules:</p>
+<p></p>
+
+<ol>
+<li>Of any 16 consecutive messages towards this endpoint that aren&#8217;t responses or acknowledgments, at least 2 of the messages must be confirmable.</li>
+<li>The confirmable messages must be sent under an RTO estimator, as specified in <a href="#rto" class="xref">Section 4</a>.</li>
+<li>The packet rate of non-confirmable messages cannot exceed 1/RTO, where RTO is the overall RTO estimator value at the time the non-confirmable packet is sent.</li>
+</ol>
+<h1 id="rfc.section.5.1">
+<a href="#rfc.section.5.1">5.1.</a> <a href="#discussion-1" id="discussion-1">Discussion</a>
+</h1>
+<p id="rfc.section.5.1.p.1">This is relatively conservative.  More advanced versions of this algorithm could run a TFRC-style Loss Event Rate calculator <a href="#RFC5348" class="xref">[RFC5348]</a> and apply the TCP equation to achieve a higher rate than 1/RTO.</p>
+<p><a href="#RFC7641" class="xref">[RFC7641]</a>, Section 4.5.1, specifies that the rate of NONs SHOULD NOT exceed 1/RTT on average, if the server can maintain an RTT estimate for a client.  CoCoA limits the packet rate of NONs in this situation to 1/RTO.  Assuming that the RTO estimation in CoCoA works as expected, RTO[k] should be slightly greater than the RTT[k], thus CoCoA would be more conservative.  The expectation therefore is that complying with the NON rate set by CoCoA leads to complying with <a href="#RFC7641" class="xref">[RFC7641]</a>.</p>
+<h1 id="rfc.section.6">
+<a href="#rfc.section.6">6.</a> <a href="#iana-considerations" id="iana-considerations">IANA Considerations</a>
+</h1>
+<p id="rfc.section.6.p.1">This document makes no requirements on IANA.  (This section to be removed by RFC editor.)</p>
+<h1 id="rfc.section.7">
+<a href="#rfc.section.7">7.</a> <a href="#security-considerations" id="security-considerations">Security Considerations</a>
+</h1>
+<p id="rfc.section.7.p.1">The security considerations of, e.g., <a href="#RFC5681" class="xref">[RFC5681]</a>, <a href="#RFC2914" class="xref">[RFC2914]</a>, and <a href="#RFC8085" class="xref">[RFC8085]</a> apply.  Some issues are already discussed in the security considerations of <a href="#RFC7252" class="xref">[RFC7252]</a>.</p>
+<h1 id="rfc.references">
+<a href="#rfc.references">8.</a> References</h1>
+<h1 id="rfc.references.1">
+<a href="#rfc.references.1">8.1.</a> Normative References</h1>
+<table><tbody>
+<tr>
+<td class="reference"><b id="RFC2119">[RFC2119]</b></td>
+<td class="top">
+<a>Bradner, S.</a>, "<a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>", BCP 14, RFC 2119, DOI 10.17487/RFC2119, March 1997.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC2914">[RFC2914]</b></td>
+<td class="top">
+<a>Floyd, S.</a>, "<a href="https://tools.ietf.org/html/rfc2914">Congestion Control Principles</a>", BCP 41, RFC 2914, DOI 10.17487/RFC2914, September 2000.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC6298">[RFC6298]</b></td>
+<td class="top">
+<a>Paxson, V.</a>, <a>Allman, M.</a>, <a>Chu, J.</a> and <a>M. Sargent</a>, "<a href="https://tools.ietf.org/html/rfc6298">Computing TCP's Retransmission Timer</a>", RFC 6298, DOI 10.17487/RFC6298, June 2011.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC7252">[RFC7252]</b></td>
+<td class="top">
+<a>Shelby, Z.</a>, <a>Hartke, K.</a> and <a>C. Bormann</a>, "<a href="https://tools.ietf.org/html/rfc7252">The Constrained Application Protocol (CoAP)</a>", RFC 7252, DOI 10.17487/RFC7252, June 2014.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC8085">[RFC8085]</b></td>
+<td class="top">
+<a>Eggert, L.</a>, <a>Fairhurst, G.</a> and <a>G. Shepherd</a>, "<a href="https://tools.ietf.org/html/rfc8085">UDP Usage Guidelines</a>", BCP 145, RFC 8085, DOI 10.17487/RFC8085, March 2017.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC8174">[RFC8174]</b></td>
+<td class="top">
+<a>Leiba, B.</a>, "<a href="https://tools.ietf.org/html/rfc8174">Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</a>", BCP 14, RFC 8174, DOI 10.17487/RFC8174, May 2017.</td>
+</tr>
+</tbody></table>
+<h1 id="rfc.references.2">
+<a href="#rfc.references.2">8.2.</a> Informative References</h1>
+<table><tbody>
+<tr>
+<td class="reference"><b id="Betzler2013">[Betzler2013]</b></td>
+<td class="top">
+<a>Betzler, A.</a>, <a>Gomez, C.</a>, <a>Demirkol, I.</a> and <a>J. Paradells</a>, "<a>Congestion control in reliable CoAP communication</a>", ACM&#160;MSWIM'13 p. 365-372, DOI 10.1145/2507924.2507954, 2013.</td>
+</tr>
+<tr>
+<td class="reference"><b id="Betzler2015">[Betzler2015]</b></td>
+<td class="top">
+<a>Betzler, A.</a>, <a>Gomez, C.</a>, <a>Demirkol, I.</a> and <a>J. Paradells</a>, "<a>CoCoA+: an Advanced Congestion Control Mechanism for CoAP</a>", Ad Hoc Networks Vol. 33 pp. 126-139, DOI 10.1016/j.adhoc.2015.04.007, October 2015.</td>
+</tr>
+<tr>
+<td class="reference"><b id="I-D.bormann-core-congestion-control">[I-D.bormann-core-congestion-control]</b></td>
+<td class="top">
+<a>Bormann, C.</a> and <a>K. Hartke</a>, "<a href="https://tools.ietf.org/html/draft-bormann-core-congestion-control-02">Congestion Control Principles for CoAP</a>", Internet-Draft draft-bormann-core-congestion-control-02, July 2012.</td>
+</tr>
+<tr>
+<td class="reference"><b id="I-D.eggert-core-congestion-control">[I-D.eggert-core-congestion-control]</b></td>
+<td class="top">
+<a>Eggert, L.</a>, "<a href="https://tools.ietf.org/html/draft-eggert-core-congestion-control-01">Congestion Control for the Constrained Application Protocol (CoAP)</a>", Internet-Draft draft-eggert-core-congestion-control-01, January 2011.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC5348">[RFC5348]</b></td>
+<td class="top">
+<a>Floyd, S.</a>, <a>Handley, M.</a>, <a>Padhye, J.</a> and <a>J. Widmer</a>, "<a href="https://tools.ietf.org/html/rfc5348">TCP Friendly Rate Control (TFRC): Protocol Specification</a>", RFC 5348, DOI 10.17487/RFC5348, September 2008.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC5681">[RFC5681]</b></td>
+<td class="top">
+<a>Allman, M.</a>, <a>Paxson, V.</a> and <a>E. Blanton</a>, "<a href="https://tools.ietf.org/html/rfc5681">TCP Congestion Control</a>", RFC 5681, DOI 10.17487/RFC5681, September 2009.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC7228">[RFC7228]</b></td>
+<td class="top">
+<a>Bormann, C.</a>, <a>Ersue, M.</a> and <a>A. Keranen</a>, "<a href="https://tools.ietf.org/html/rfc7228">Terminology for Constrained-Node Networks</a>", RFC 7228, DOI 10.17487/RFC7228, May 2014.</td>
+</tr>
+<tr>
+<td class="reference"><b id="RFC7641">[RFC7641]</b></td>
+<td class="top">
+<a>Hartke, K.</a>, "<a href="https://tools.ietf.org/html/rfc7641">Observing Resources in the Constrained Application Protocol (CoAP)</a>", RFC 7641, DOI 10.17487/RFC7641, September 2015.</td>
+</tr>
+</tbody></table>
+<h1 id="rfc.appendix.A">
+<a href="#rfc.appendix.A">Appendix A.</a> <a href="#evidence" id="evidence">Supporting evidence</a>
+</h1>
+<p id="rfc.section.A.p.1">(Editor&#8217;s note: The references local to this appendix may need to be merged with those from the specification proper, depending on the discretion of the RFC editor.)</p>
+<p id="rfc.section.A.p.2">CoCoA has been evaluated by means of simulation and experimentation in diverse scenarios comprising different link layer technologies, network topologies, traffic patterns and device classes. The main overall evaluation result is that CoCoA consistently delivers a performance which is better than, or at least similar to, that of default CoAP congestion control. While the latter is insensitive to network conditions, CoCoA is adaptive and makes good use of RTT samples.</p>
+<p id="rfc.section.A.p.3">It has been shown over real GPRS and IEEE 802.15.4 mesh network testebds that in these settings, in comparison to default CoAP, CoCoA increases throughput and reduces the time it takes for a network to process traffic bursts, while not sacrificing fairness. In contrast, other RTT-sensitive approaches such as Linux-RTO or Peak-Hopper-RTO may be too simple or do not adapt well to IoT scenarios, underperforming default CoAP under certain conditions [1]. On the other hand, CoCoA has been found to reduce latency in GPRS and Wi-Fi setups, compared with default CoAP [2].</p>
+<p id="rfc.section.A.p.4">CoCoA performance has also been evaluated for non-confirmable traffic over emulated GPRS/UMTS links and over a real IEEE 802.15.4 mesh testbed. Results show that since CoCoA is adaptive, it yields better packet delivery ratio than default CoAP (which does not apply congestion control to non-confirmable messages) or Observe (which introduces congestion control that is not adaptive to network conditions) [3, 4].</p>
+<h1 id="rfc.appendix.A.1">
+<a href="#rfc.appendix.A.1">A.1.</a> <a href="#older-versions-of-the-draft-and-improvement" id="older-versions-of-the-draft-and-improvement">Older versions of the draft and improvement</a>
+</h1>
+<p id="rfc.section.A.1.p.1">CoCoA has evolved since its initial draft version. Its core has remained mostly stable since draft-bormann-core-cocoa-02. The evolution of CoCoA has been driven by research work. This process, including evaluations of early versions of CoCoA, as well as improvement proposals that were finally incorporated in CoCoA, is reflected in published works [5-10].</p>
+<h1 id="rfc.appendix.A.2">
+<a href="#rfc.appendix.A.2">A.2.</a> <a href="#references" id="references">References</a>
+</h1>
+<p id="rfc.section.A.2.p.1">[1] A. Betzler, C. Gomez, I. Demirkol, J. Paradells, &#8220;CoAP congestion control for the Internet of Things&#8221;, IEEE Communications Magazine, July 2016.</p>
+<p id="rfc.section.A.2.p.2">[2] F. Zheng, B. Fu, Z. Cao, &#8220;CoAP Latency Evaluation&#8221;, draft-zheng-core-coap-lantency-evaluation-00, 2016 (work in progress).</p>
+<p id="rfc.section.A.2.p.3">[3] A. Betzler, C. Gomez, I. Demirkol, &#8220;Evaluation of Advanced Congestion Control Mechanisms for Unreliable CoAP Communications&#8221;, PE-WASUN, Canc&#250;n, Mexico, 2015.</p>
+<p id="rfc.section.A.2.p.4">[4] A. Betzler, J. Isern, C. Gomez, I. Demirkol, J. Paradells, &#8220;Experimental Evaluation of Congestion Control for CoAP Communications without End-to-End Reliability&#8221;, Ad Hoc Networks, Volume 52, 1 December 2016, Pages 183-194.</p>
+<p id="rfc.section.A.2.p.5">[5] A. Betzler, C. Gomez, I. Demirkol, J. Paradells, &#8220;Congestion Control in Reliable CoAP Communication&#8221;, 16th ACM International Conference on Modeling, Analysis and Simulation of Wireless and Mobile Systems (MSWIM&#8217;13), Barcelona, Spain, Nov. 2013.</p>
+<p id="rfc.section.A.2.p.6">[6] A. Betzler, C. Gomez, I. Demirkol, M. Kovatsch, &#8220;Congestion Control for CoAP cloud services&#8221;, 8th International Workshop on Service-Oriented Cyber-Physical Systems in Converging Networked Environments (SOCNE) 2014, Barcelona, Spain, Sept. 2014.</p>
+<p id="rfc.section.A.2.p.7">[7] A. Betzler, C. Gomez, I. Demirkol, J. Paradells, &#8220;CoCoA+: an advanced congestion control mechanism for CoAP&#8221;, Ad Hoc Networks journal, 2015.</p>
+<p id="rfc.section.A.2.p.8">[8] Bhalerao, Rahul, Sridhar Srinivasa Subramanian, and Joseph Pasquale. &#8220;An analysis and improvement of congestion control in the CoAP Internet-of-Things protocol.&#8221; 2016 13th IEEE Annual Consumer Communications &amp; Networking Conference (CCNC). IEEE, 2016.</p>
+<p id="rfc.section.A.2.p.9">[9] I J&#228;rvinen, L Daniel, M Kojo, &#8220;Experimental evaluation of alternative congestion control algorithms for Constrained Application Protocol (CoAP)&#8221;, IEEE 2nd World Forum on Internet of Things (WF-IoT), 2015.</p>
+<p id="rfc.section.A.2.p.10">[10] Balandina, Ekaterina, Yevgeni Koucheryavy, and Andrei Gurtov. &#8220;Computing the retransmission timeout in coap.&#8221; Internet of Things, Smart Spaces, and Next Generation Networking. Springer Berlin Heidelberg, 2013. 352-362.</p>
+<h1 id="rfc.acknowledgements"><a href="#rfc.acknowledgements">Acknowledgements</a></h1>
+<p id="rfc.section.B.p.1">The first document to examine CoAP congestion control issues in detail was <a href="#I-D.eggert-core-congestion-control" class="xref">[I-D.eggert-core-congestion-control]</a>, to which this draft owes a lot.</p>
+<p id="rfc.section.B.p.2">Michael Scharf did a review of CoAP congestion control issues that asked a lot of good questions.  Several Transport Area representatives made further significant inputs this discussion during IETF84, including Lars Eggert, Michael Scharf, and David Black.  Andrew McGregor, Eric Rescorla, Richard Kelsey, Ed Beroset, Jari Arkko, Zach Shelby, Matthias Kovatsch and many others provided very useful additions.</p>
+<p id="rfc.section.B.p.3">Authors from Universitat Politecnica de Catalunya have been supported in part by the Spanish Government&#8217;s Ministerio de Econom&#237;a y Competitividad through projects TEC2009-11453 and TEC2012-32531, and FEDER.</p>
+<p id="rfc.section.B.p.4">Carles Gomez has been funded in part by the Spanish Government (Ministerio de Educacion, Cultura y Deporte) through the Jose Castillejo grant CAS15/00336.  His contribution to this work has been carried out in part during his stay as a visiting scholar at the Computer Laboratory of the University of Cambridge, in collaboration with Prof. Jon Crowcroft.</p>
+<h1 id="rfc.authors"><a href="#rfc.authors">Authors' Addresses</a></h1>
+<div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Carsten Bormann</span> 
+	  <span class="n hidden">
+		<span class="family-name">Bormann</span>
+	  </span>
+	</span>
+	<span class="org vcardline">Universit&#228;t Bremen TZI</span>
+	<span class="adr">
+	  <span class="vcardline">Postfach 330440</span>
+
+	  <span class="vcardline">
+		<span class="locality">Bremen</span>,  
+		<span class="region"></span>
+		<span class="code">D-28359</span>
+	  </span>
+	  <span class="country-name vcardline">Germany</span>
+	</span>
+	<span class="vcardline">Phone: +49-421-218-63921</span>
+
+<span class="vcardline">EMail: <a href="mailto:cabo@tzi.org">cabo@tzi.org</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">August Betzler</span> 
+	  <span class="n hidden">
+		<span class="family-name">Betzler</span>
+	  </span>
+	</span>
+	<span class="org vcardline">Fundaci&#243; i2CAT</span>
+	<span class="adr">
+	  <span class="vcardline">Mobile and Wireless Internet Group</span>
+<span class="vcardline">C/ del Gran Capit&#224;, 2</span>
+
+	  <span class="vcardline">
+		<span class="locality">Barcelona</span>,  
+		<span class="region"></span>
+		<span class="code">08034</span>
+	  </span>
+	  <span class="country-name vcardline">Spain</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:august.betzler@entel.upc.edu">august.betzler@entel.upc.edu</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Carles Gomez</span> 
+	  <span class="n hidden">
+		<span class="family-name">Gomez</span>
+	  </span>
+	</span>
+	<span class="org vcardline">Universitat Politecnica de Catalunya/Fundacio i2CAT</span>
+	<span class="adr">
+	  <span class="vcardline">Escola d'Enginyeria de Telecomunicacio i Aeroespacial</span>
+<span class="vcardline">de Castelldefels</span>
+<span class="vcardline">C/Esteve Terradas, 7</span>
+
+	  <span class="vcardline">
+		<span class="locality">Castelldefels</span>,  
+		<span class="region"></span>
+		<span class="code">08860</span>
+	  </span>
+	  <span class="country-name vcardline">Spain</span>
+	</span>
+	<span class="vcardline">Phone: +34-93-413-7206</span>
+
+<span class="vcardline">EMail: <a href="mailto:carlesgo@entel.upc.edu">carlesgo@entel.upc.edu</a></span>
+
+  </address>
+</div><div class="avoidbreak">
+  <address class="vcard">
+	<span class="vcardline">
+	  <span class="fn">Ilker Demirkol</span> 
+	  <span class="n hidden">
+		<span class="family-name">Demirkol</span>
+	  </span>
+	</span>
+	<span class="org vcardline">Universitat Politecnica de Catalunya/Fundacio i2CAT</span>
+	<span class="adr">
+	  <span class="vcardline">Departament d'Enginyeria Telematica</span>
+<span class="vcardline">C/Jordi Girona, 1-3</span>
+
+	  <span class="vcardline">
+		<span class="locality">Barcelona</span>,  
+		<span class="region"></span>
+		<span class="code">08034</span>
+	  </span>
+	  <span class="country-name vcardline">Spain</span>
+	</span>
+	<span class="vcardline">EMail: <a href="mailto:ilker.demirkol@entel.upc.edu">ilker.demirkol@entel.upc.edu</a></span>
+
+  </address>
+</div>
+
+  <div class="github-fork-ribbon-wrapper"><div class="github-fork-ribbon"><a href="https://github.com/core-wg/cocoa">Fork me on GitHub</a></div></div>
+</body>
+</html>
