@@ -1,8 +1,8 @@
 ---
 title: CoAP Simple Congestion Control/Advanced
 abbrev: CoAP Simple CoCoA
-docname: draft-ietf-core-cocoa-latest
-date: 2017-10-26
+docname: draft-ietf-core-cocoa-02
+date: 2017-10-29
 
 stand_alone: true
 
@@ -39,7 +39,7 @@ author:
         city: Barcelona
         code: 08034
         country: Spain
-        email: august.betzler@entel.upc.edu
+        email: august.betzler@i2cat.net
       -
         ins: C. Gomez
         name: Carles Gomez
@@ -119,9 +119,16 @@ congestion with minimal implementation requirements.  It also leaves
 room for combining the base specification with advanced congestion
 control mechanisms with higher performance.
 
-This specification defines some simple advanced CoRE Congestion
-Control mechanisms, Simple CoCoA.  It is making use of input from
-simulations and experiments in real networks.
+This specification defines some simple advanced CoRE
+Congestion Control mechanisms, CoCoA.  The core of these
+mechanisms is a Retransmission TimeOut (RTO) algorithm that makes use of
+Round-Trip Time (RTT) estimates, in contrast with how the RTO is
+determined as per the base CoAP specification (RFC 7252). The mechanisms 
+defined in this document have relatively low complexity, yet they improve 
+the default CoAP RTO algorithm. The design of the mechanisms in this 
+specification has made use of input from simulations and experiments in 
+real networks.
+
 
 --- middle
 
@@ -161,7 +168,7 @@ the following terminology:
 Initiator:
 : The endpoint that sends the message that initiates an exchange.
   E.g., the party that sends a confirmable message, or a
-  non-confirmable message conveying a request.
+  non-confirmable message (see Section 4.3 of RFC 7252) conveying a request.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
@@ -210,6 +217,9 @@ The objective is to be "better" than default CoAP congestion control
 in a number of characteristics, including achievable goodput for a
 given offered load, latency, and recovery from bursts, while providing more predictable
 stress to the network and the same level of safety from catastrophic congestion.
+The algorithm defined in this document is intended to adapt to the current characteristics
+of any underlying network, and therefore is well suited for a wide range of network 
+conditions, in terms of bandwidth, latency, load, loss rate, topology, etc. 
 It does require three state variables per scope plus the state needed
 to do RTT measurements, so it may not be applicable to the most
 constrained devices (class 1 as per {{?RFC7228}}).
@@ -222,19 +232,26 @@ larger scopes needs to be examined.
 Advanced CoAP Congestion Control: RTO Estimation {#rto}
 ================================================
 <!-- Carles: clarify RTT vs. RTO -->
+<!--  I hope the added text suffices... -->
 
 For an initiator that plans to make multiple requests to one
 destination endpoint, it may be worthwhile to make RTT measurements in
 order to obtain a better RTO estimation than that implied by the
-default initial timeout of 2 to 3 s.  This is based on the usual
-algorithms for RTO estimation {{?RFC6298}}, with appropriately
+default initial timeout of 2 to 3 s.  In particular, a wide spectrum 
+of RTT values is expected in different types of networks where CoAP is used.
+Those RTTs range from several orders of magnitude below the default initial 
+timeout to values larger than the default. The algorithm defined in this document
+is based on the algorithm for RTO estimation defined in {{?RFC6298}}, with appropriately
 extended default/base values, as proposed in {{mod}}.  Note that
 such a mechanism must, during idle periods, decay RTO estimates that
-are shorter or longer than the basic RTO estimate back to the basic RTO
+are shorter or longer than the default RTO estimate back to the default RTO
 estimate, until fresh measurements become available again, as proposed
 in {{aging}}.
 
-One important consideration not relevant for TCP is the fact that a
+RTT variability challenges RTO estimation. In TCP, delayed ACKs contribute
+to RTT variability, since this option adds a delay of up to 500 ms 
+(typically, 200 ms) before an ACK is sent by a receiving TCP endpoint. However,
+one important consideration not relevant for TCP is the fact that a
 CoAP round-trip may include application processing time, which may be
 hard to predict, and may differ between different resources available
 at the same endpoint.
@@ -245,10 +262,12 @@ Servers will only trigger their early ACKs (with a
 non-piggybacked response to be sent later) based on the default
 timers, e.g. after 1 s. A client that has arrived at a RTO estimate
 shorter than 1 s SHOULD therefore use a larger backoff factor for
-retransmissions to avoid expending all of its retransmissions in the
-default interval of 2 to 3 s.  A proposal for a mechanism with variable
+retransmissions to avoid expending all of its retransmissions 
+(see Section 4.2 of RFC 7252) in the default interval of 2 to 3 s.  
+A proposal for a mechanism with variable
 backoff factors is presented in {{mod}}.
 <!-- Do we have that below already??? -->
+<!--   Yes, in the section on differences with 6298 -->
 
 It may also be worthwhile to do RTT estimates not just based on
 information measured from a single destination endpoint, but also
@@ -272,7 +291,7 @@ additional exchange is 6 seconds.
 ## Measured RTO Estimate
 
 The RTO estimator runs two copies of the algorithm defined in
-{{!RFC6298}}, as modified in {{mod}}:
+{{!RFC6298}}, with the differences introduced in {{mod}}:
 One copy for exchanges that complete on initial transmissions (the
 "strong estimator", E_strong_), and one copy for exchanges that have run into
 retransmissions, where only the first two retransmissions are
@@ -284,22 +303,27 @@ not used to update an estimator.
 
 
 The overall RTO estimate is an exponentially weighted moving average
-(alpha = 0.5 and 0.25, respectively) computed of the strong and the weak estimator, which is
+computed of the strong and the weak estimator, which is
 evolved after each contribution to the weak estimator (1) or to the strong
-estimator (2), from the estimator that made the most recent contribution:
+estimator (2), from the estimator (either the weak or strong estimator) that made the
+most recent contribution:
 
-> RTO := 0.25 * E_weak_ + 0.75 * RTO  (1)
+> RTO := w_weak * E_weak_ + (1 - w_weak) * RTO           (1)
 
-> RTO := 0.5 * E_strong_ + 0.5 * RTO  (2)
+> RTO := w_strong * E_strong_ + (1 - w_strong) * RTO     (2)
 
 (Splitting this update into the two cases avoids making the
 contribution of the weak estimator too big in naturally lossy
 networks.)
 
-### Modifications to the algorithm of RFC 6298 {#mod}
+The default values for the corresponding weights, w_weak and w_strong, are 
+0.25 and 0.5, respectively. Pseudocode and examples for the overall RTO estimate
+presented are available in {{pseudo-rto}} and {{examples-rto}}.
 
-This subsection presents three modifications that must be applied to
-the algorithm of {{?RFC6298}} as per this document.  The first two
+### Differences with the algorithm of RFC 6298 {#mod}
+
+This subsection presents three differences of the algorithm defined in this 
+document with the one defined in {{?RFC6298}}.  The first two
 recommend new parameter settings.  The third one is the variable
 backoff factor mechanism.
 
@@ -311,15 +335,13 @@ of the RTO in the case that the RTTVAR value is very large, which may
 be the case if a weak RTT measurement is obtained after one or more
 retransmissions.
 
-If an RTO estimation is lower than 1 s or higher than 3 s, instead of
-applying a binary backoff factor in both cases, a variable backoff
-factor is used. For RTO estimations below 1 s, the RTO for a
-retransmission is multiplied by 3, while for estimations above 3 s,
-the RTO is multiplied only by 1.5 (this updated choice of numbers to
-be verified by more simulations).  This helps to avoid that exchanges
-with small initial RTOs use up all retransmissions in a short interval
-of time and exchanges with large initial RTOs may not be able to carry
-out all retransmissions within MAX_TRANSMIT_WAIT (93 s).
+In order to avoid that exchanges with small initial RTOs (i.e. RTO estimation lower
+than 1 s) use up all retransmissions in a short interval of time, the RTO for 
+a retransmission is multiplied by 3.
+
+On the other hand, to avoid exchanges with large initial RTOs 
+(i.e. RTO estimation greater than 3 s) not being able to carry out all 
+retransmissions within MAX_TRANSMIT_WAIT (93 s), the RTO is then multiplied only by 1.5.
 
 The binary exponential backoff is truncated at 32 seconds.
 Similar to the way retransmissions are handled in the base specification, they
@@ -336,8 +358,12 @@ loss.  This approach appears to contravene the mandate in Section
 ambiguous transactions".  However, those samples are not simply
 combined into the strong estimator, but are used to correct the
 limited knowledge that can be gained from the strong RTT measurements
-by employing an additional weak estimator.  Evidence that has been
-collected from experiments appears to support that the overall effect
+by employing an additional weak estimator.  In fact, the weak estimator
+allows to better update the RTO estimator when mostly weak RTTs are 
+available, either due to the lossy nature of links or due to congestion-induced
+losses. In presence of the latter, spurious timeouts are avoided and the rate 
+of retries is reduced, which allows to decrease congestion. Evidence that has
+been collected from experiments appears to support that the overall effect
 of using this data in the way described is beneficial ({{evidence}}).
 
 Some evaluation has been done on earlier versions of this
@@ -364,6 +390,9 @@ is set to be
 (Note that, instead of running a timer, it is possible to implement
 these RTO aging calculations cumulatively at the time the estimator is used next.)
 
+Psuedocode and examples for the aging mechanism presented are available in {{pseudo-aging}}
+and in {{examples-aging}}.
+
 Advanced CoAP Congestion Control: Non-Confirmables
 ==================================================
 
@@ -382,8 +411,7 @@ sent as non-confirmables) are governed by the following rules:
    responses or acknowledgments, at least 2 of the messages must be
    confirmable.
 
-2. The confirmable messages must be sent under an RTO estimator, as
-   specified in {{rto}}.
+2. An RTO as specified in {{rto}} must be used for confirmable messages. 
 
 3. The packet rate of non-confirmable messages cannot exceed 1/RTO,
    where RTO is the overall RTO estimator value at the time the
@@ -391,7 +419,7 @@ sent as non-confirmables) are governed by the following rules:
 
 ## Discussion
 
-This is relatively conservative.  More advanced versions of this
+The mechanism defined above for non-confirmables is relatively conservative.  More advanced versions of this
 algorithm could run a TFRC-style Loss Event Rate calculator {{?RFC5348}} and apply
 the TCP equation to achieve a higher rate than 1/RTO.
 
@@ -418,6 +446,18 @@ The security considerations of, e.g., {{?RFC5681}},
 in the security considerations of {{-coap}}.
 
 <!-- Add text on attacks on the CC -->
+If a malicious node manages to drop packets, a consequence will be an RTO
+increase, which will further reduce network performance. Note that this type
+of attack is not specific for CoCoA (and not even specific for CoAP), and many
+congestion control algorithms increase the RTO upon packet loss detection. 
+An approach that allows mitigating this type of attack is using network access
+control techniques.
+
+CoCoA naturally provides protection against packet losses produced by a radio
+jamming attack. In fact, the weak estimator in CoCoA increases the chances of
+obtaining RTT measurements in the presence of packet losses, allowing to keep 
+the RTO updated, which in turn allows recovery from the attack in reasonable time.
+
 
 --- back
 
@@ -512,6 +552,103 @@ Gurtov. "Computing the retransmission timeout in coap." Internet of
 Things, Smart Spaces, and Next Generation Networking. Springer Berlin
 Heidelberg, 2013. 352-362.
 
+# Pseudocode {#pseudo}
+
+## Updating the RTO estimator {#pseudo-rto}
+
+updateRTO(retransmissions, RTT) {
+   if(retransmissions == 0) {
+       RTTVAR_strong = (1 - BETA) * RTTVAR_strong + BETA (RTT_strong_old - RTT);
+       RTT_strong  = (1-ALPHA) * RTT_old + ALPHA * RTT;
+       E_strong = RTT_strong  + 4 * RTTVAR_strong;
+       RTO_new = 0.5 * E_strong + 0.5 RTO_previous;
+   } else if (retransmissions <= 2) {
+       RTTVAR_weak = (1 - BETA) * RTTVAR_weak + BETA (RTT_weak_old - RTT);
+       RTT_weak  = (1-ALPHA) * RTT_weak + ALPHA * RTT;
+       E_weak = RTT_weak  + 1 * RTTVAR_weak;
+       RTO_new = 0.25 * E_weak
+   }
+}
+
+## RTO aging {#pseudo-aging}
+
+checkAging(destination) {
+   clock_time difference = getCurrentTime() - lastUpdatedTime(destination);
+
+   if ((currentRTO(destination) < 1s) && (difference > (16 * currentRTO(destination)) {
+        currentRTO(destination) = 2 * currentRTO(destination);
+        lastUpdated(destination) = getCurrentTime();
+   } else if ((currentRTO(destination) > 3s) && (difference > (4 * currentRTO(destination)) {
+        currentRTO(destination) = 1s + 0.5 * currentRTO(destination);
+        lastUpdated(destination) = getCurrentTime();
+   }
+}
+
+# Examples {#examples}
+
+## Example A.1: weak RTTs {#examples-rto}
+
+A large network of sensor nodes that report periodical measurements is operating normally, 
+without congestion. The nodes transmit their sensor readings via CON messages every 20 s 
+in an asynchronous way towards a server located behind a gateway, obtaining strong RTT 
+measurements (RTT 1.1 s, RTTVAR 0.1 s) that lead to the calculation of an RTO of 1.5 s 
+(in average) in each node. In this mode of operation, no aging is applied, since the RTO 
+is refreshed before the aging mechanism applies.
+
+Suddenly, upon detection of a global event, the majority of sensor nodes start transmitting
+at a higher rate (every 5 s) to increase the resolution of the acquired data, which creates
+heavy congestion that leads to packet losses and an important increase of real RTT between 
+the nodes and the server (RTT 2s, RTTVAR 1s). Due to the packet losses and spurious 
+retransmissions (which can fuel congestion even more), many nodes are not able to update 
+their RTO via strong RTT measurements, but they are able to obtain weak RTT measurements. 
+A node with an initial RTO of 1.5 would run into a retransmission, before obtaining an ACK
+(given the RTT of 2 s and that the ACK is not lost).
+
+This weak RTT measurement would increase the overall RTO of the node to 1.875 s
+(RTO = 0.25 * 3 s + 0.75 * 1.5 s). Following the same calculus (and RTT/RTTVAR values), 
+after obtaining another weak RTT, the RTO would increase to 2.156 s. At this point, the 
+benefits of the weak RTT measurements are twofold: 
+1) Further spurious retransmissions are avoided as the RTO has increased above the real RTT. 
+2) The increase of RTOs across the whole network reduces the rate with which retransmissions
+are generated, decreasing the network congestion (which leads to an RTT and packet loss decrease).
+
+## Example A.2: VBF and aging {#examples-aging}
+
+Assuming that the frequency of message generation is even higher (every 3s) and the real RTT 
+would further increase due to congestion, the RTO at some point would increase to 4 s. Since 
+now the RTO is above 3 s, no longer a binary backoff is used to avoid the RTO growing too much
+in case of retransmissions. As the generation of data from the nodes ceases at some point 
+(the network returns to a normal state), the aging mechanism would reduce the RTO automatically
+(with an RTO of 4 s, after 16 s the RTO would be shifted to 3 s before a new RTT is measured).
+
+## Example B: VBF and aging
+
+A network of nodes connected over 4G with an Internet service is calculating very small 
+RTO values (0.3 s) and the nodes are transmitting CON messages every 1 s. Suddenly, the connection
+quality gets worse and the nodes switch to a more stable, yet slower connection via GPRS. 
+As a result of this change, the nodes run into retransmissions, as the real RTT has increased 
+above the calculated RTO. 
+
+Since the RTO is below 1 s, the Variable Backoff Factor increases the backoff values quickly 
+to avoid spurious retransmissions (0.9 s first retry, 2.7 s second retry, etc.). Further, if 
+due to the packet losses and increased delays in the network no new RTT measurements are obtained,
+the aging mechanism automatically increases the RTO (doubling it) after 3.8 s (16 * 0.3 s) to adapt
+better to the sudden changes of network conditions. Without the Variable Backoff Factor and the aging
+mechanism, the number of spurious retransmissions would be much higher and the RTO would be corrected more slowly.
+
+# Analysis: difference between strong and weak estimators
+
+This section analyzes the difference between the strong and weak RTO estimators.
+If there is no congestion, assume a static RTT of R’. Then, E_strong_can be expressed as:
+     E_strong_ = R’ + G,
+since RTTVAR is reduced constantly by RTTVAR = RTTVAR * 3/4 (acc. To RFC6298, and SRTT=R’), G would
+be dominant term in the max(G, K * RTTVAR) expression in the long run.
+For the weak estimator: assume that the RTO setting converges to E_strong_ calculated above in the long run.
+If there is a packet loss, and an RTT is obtained for the first retransmission, then the weak RTT sample
+obtained by the weak estimator is:
+     RW’ = R’+ G + R’
+Therefore, E_weak_ can be expressed as:
+     E_weak_ = RW’ + max (G, RW’/2) = 3 * R’
 
 
 Acknowledgements
@@ -531,7 +668,7 @@ additions.
 
 Authors from Universitat Politecnica de Catalunya have been supported
 in part by the Spanish Government's Ministerio de Economía y
-Competitividad through projects TEC2009-11453 and TEC2012-32531, and
+Competitividad through projects TEC2009-11453, TEC2012-32531, TEC2016-79988-P and
 FEDER.
 
 Carles Gomez has been funded in part by the Spanish Government
