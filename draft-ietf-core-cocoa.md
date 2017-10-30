@@ -2,7 +2,7 @@
 title: CoAP Simple Congestion Control/Advanced
 abbrev: CoAP Simple CoCoA
 docname: draft-ietf-core-cocoa-latest
-date: 2017-10-29
+# date: 2017-10-30
 
 stand_alone: true
 
@@ -173,8 +173,8 @@ Initiator:
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-"OPTIONAL" in this document are to be interpreted as described in BCP
-14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all
+"OPTIONAL" in this document are to be interpreted as described in
+BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all
 capitals, as shown here.
 
 (Note that the present document is itself informational, but it is
@@ -391,7 +391,7 @@ is set to be
 (Note that, instead of running a timer, it is possible to implement
 these RTO aging calculations cumulatively at the time the estimator is used next.)
 
-Psuedocode and examples for the aging mechanism presented are available in {{pseudo-aging}}
+Pseudocode and examples for the aging mechanism presented are available in {{pseudo-aging}}
 and in {{examples-aging}}.
 
 Advanced CoAP Congestion Control: Non-Confirmables
@@ -424,9 +424,9 @@ The mechanism defined above for non-confirmables is relatively conservative.  Mo
 algorithm could run a TFRC-style Loss Event Rate calculator {{?RFC5348}} and apply
 the TCP equation to achieve a higher rate than 1/RTO.
 
-{{-observe}}, Section 4.5.1, specifies that the rate of NONs SHOULD
+{{-observe}}, Section 4.5.1, specifies that the rate of Non-Confirmables SHOULD
 NOT exceed 1/RTT on average, if the server can maintain an RTT
-estimate for a client.  CoCoA limits the packet rate of NONs in this
+estimate for a client.  CoCoA limits the packet rate of Non-Confirmables in this
 situation to 1/RTO.
 Assuming that the RTO estimation in CoCoA works as expected, RTO[k]
 should be slightly greater than the RTT[k], thus CoCoA would be more
@@ -477,13 +477,13 @@ network conditions, CoCoA is adaptive and makes good use of RTT
 samples.
 
 It has been shown over real GPRS and IEEE 802.15.4 mesh network
-testebds that in these settings, in comparison to default CoAP, CoCoA
+testbeds that in these settings, in comparison to default CoAP, CoCoA
 increases throughput and reduces the time it takes for a network to
 process traffic bursts, while not sacrificing fairness. In contrast,
 other RTT-sensitive approaches such as Linux-RTO or Peak-Hopper-RTO
 may be too simple or do not adapt well to IoT scenarios,
 underperforming default CoAP under certain conditions \[1]. On the
-other hand, CoCoA has been found to reduce latency in GPRS and Wi-Fi
+other hand, CoCoA has been found to reduce latency in GPRS and WiFi
 setups, compared with default CoAP \[2].
 
 CoCoA performance has also been evaluated for non-confirmable traffic
@@ -569,13 +569,13 @@ updateRTO(retransmissions, RTT) {
                   + BETA * (RTT_strong - RTT);
     RTT_strong  = (1 - ALPHA) * RTT_strong + ALPHA * RTT;
     E_strong = RTT_strong  + 4 * RTTVAR_strong;
-    RTO_new = W_STRONG * E_strong + (1 - W_STRONG) * RTO_previous;
+    RTO = W_STRONG * E_strong + (1 - W_STRONG) * RTO;
   } else if (retransmissions <= 2) {
     RTTVAR_weak = (1 - BETA) * RTTVAR_weak
                 + BETA * (RTT_weak - RTT);
     RTT_weak  = (1 - ALPHA) * RTT_weak + ALPHA * RTT;
     E_weak = RTT_weak  + 1 * RTTVAR_weak;
-    RTO_new = W_WEAK * E_weak + (1 - W_WEAK) * RTO_previous
+    RTO = W_WEAK * E_weak + (1 - W_WEAK) * RTO
   }
 }
 ~~~~
@@ -735,4 +735,10 @@ with Prof. Jon Crowcroft.
 <!--  LocalWords:  lossy multicast TCP's ACKs IANA TBD BCP Unicast WG
  -->
 <!--  LocalWords:  latencies RTO backoff bormann NSTART confirmables
+ -->
+<!--  LocalWords:  goodput tuple Responder RTTs Pseudocode RTTVAR
+ -->
+<!--  LocalWords:  RTOs Betzler CoCoA topologies GPRS testbeds UMTS
+ -->
+<!--  LocalWords:  underperforming testbed WiFi
  -->
