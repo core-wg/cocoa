@@ -553,33 +553,43 @@ Heidelberg, 2013. 352-362.
 
 ## Updating the RTO estimator {#pseudo-rto}
 
+~~~~
+// Default values
+ALPHA = 0.125 // RFC 6298
+BETA = 0.25 // RFC 6298
+W_STRONG = 0.5
+W_WEAK = 0.25
+
 updateRTO(retransmissions, RTT) {
-   if(retransmissions == 0) {
-       RTTVAR_strong = (1 - BETA) * RTTVAR_strong + BETA (RTT_strong_old - RTT);
-       RTT_strong  = (1-ALPHA) * RTT_old + ALPHA * RTT;
+   if (retransmissions == 0) {
+       RTTVAR_strong = (1 - BETA) * RTTVAR_strong + BETA * (RTT_strong - RTT);
+       RTT_strong  = (1 - ALPHA) * RTT_strong + ALPHA * RTT;
        E_strong = RTT_strong  + 4 * RTTVAR_strong;
-       RTO_new = 0.5 * E_strong + 0.5 RTO_previous;
+       RTO_new = W_STRONG * E_strong + (1 - W_STRONG) * RTO_previous;
    } else if (retransmissions <= 2) {
-       RTTVAR_weak = (1 - BETA) * RTTVAR_weak + BETA (RTT_weak_old - RTT);
-       RTT_weak  = (1-ALPHA) * RTT_weak + ALPHA * RTT;
+       RTTVAR_weak = (1 - BETA) * RTTVAR_weak + BETA (RTT_weak - RTT);
+       RTT_weak  = (1 - ALPHA) * RTT_weak + ALPHA * RTT;
        E_weak = RTT_weak  + 1 * RTTVAR_weak;
-       RTO_new = 0.25 * E_weak
+       RTO_new = W_WEAK * E_weak + (1 - W_WEAK) * RTO_previous
    }
 }
+~~~~
 
 ## RTO aging {#pseudo-aging}
 
-checkAging(destination) {
-   clock_time difference = getCurrentTime() - lastUpdatedTime(destination);
+~~~~
+checkAging() {
+   clock_time difference = getCurrentTime() - lastUpdatedTime;
 
-   if ((currentRTO(destination) < 1s) && (difference > (16 * currentRTO(destination)) {
-        currentRTO(destination) = 2 * currentRTO(destination);
-        lastUpdated(destination) = getCurrentTime();
-   } else if ((currentRTO(destination) > 3s) && (difference > (4 * currentRTO(destination)) {
-        currentRTO(destination) = 1s + 0.5 * currentRTO(destination);
-        lastUpdated(destination) = getCurrentTime();
+   if ((RTO < 1s) && (difference > (16 * RTO) {
+    RTO = 2 * RTO;
+    lastUpdatedTime = getCurrentTime();
+   } else if ((RTO > 3s) && (difference > (4 * RTO) {
+    RTO = 1s + 0.5 * RTO;
+    lastUpdatedTime = getCurrentTime();
    }
 }
+~~~~
 
 # Examples {#examples}
 
