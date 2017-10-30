@@ -98,13 +98,13 @@ Table of Contents
    Appendix B.  Pseudocode . . . . . . . . . . . . . . . . . . . . .  13
      B.1.  Updating the RTO estimator  . . . . . . . . . . . . . . .  13
      B.2.  RTO aging . . . . . . . . . . . . . . . . . . . . . . . .  13
-   Appendix C.  Examples . . . . . . . . . . . . . . . . . . . . . .  13
-     C.1.  Example A.1: weak RTTs  . . . . . . . . . . . . . . . . .  13
-     C.2.  Example A.2: VBF and aging  . . . . . . . . . . . . . . .  14
-     C.3.  Example B: VBF and aging  . . . . . . . . . . . . . . . .  14
+   Appendix C.  Examples . . . . . . . . . . . . . . . . . . . . . .  14
+     C.1.  Example A.1: weak RTTs  . . . . . . . . . . . . . . . . .  14
+     C.2.  Example A.2: VBF and aging  . . . . . . . . . . . . . . .  15
+     C.3.  Example B: VBF and aging  . . . . . . . . . . . . . . . .  15
    Appendix D.  Analysis: difference between strong and weak
                 estimators . . . . . . . . . . . . . . . . . . . . .  15
-   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  15
+   Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  16
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 
@@ -691,27 +691,56 @@ Appendix B.  Pseudocode
 
 B.1.  Updating the RTO estimator
 
-   updateRTO(retransmissions, RTT) { if(retransmissions == 0) {
-   RTTVAR_strong = (1 - BETA) * RTTVAR_strong + BETA (RTT_strong_old -
-   RTT); RTT_strong = (1-ALPHA) * RTT_old + ALPHA * RTT; E_strong =
-   RTT_strong + 4 * RTTVAR_strong; RTO_new = 0.5 * E_strong + 0.5
-   RTO_previous; } else if (retransmissions <= 2) { RTTVAR_weak = (1 -
-   BETA) * RTTVAR_weak + BETA (RTT_weak_old - RTT); RTT_weak = (1-ALPHA)
-   * RTT_weak + ALPHA * RTT; E_weak = RTT_weak + 1 * RTTVAR_weak;
-   RTO_new = 0.25 * E_weak } }
+// Default values
+ALPHA = 0.125 // RFC 6298
+BETA = 0.25 // RFC 6298
+W_STRONG = 0.5
+W_WEAK = 0.25
+
+updateRTO(retransmissions, RTT) {
+   if (retransmissions == 0) {
+       RTTVAR_strong = (1 - BETA) * RTTVAR_strong + BETA * (RTT_strong - RTT);
+       RTT_strong  = (1 - ALPHA) * RTT_strong + ALPHA * RTT;
+       E_strong = RTT_strong  + 4 * RTTVAR_strong;
+       RTO_new = W_STRONG * E_strong + (1 - W_STRONG) * RTO_previous;
+   } else if (retransmissions <= 2) {
+       RTTVAR_weak = (1 - BETA) * RTTVAR_weak + BETA (RTT_weak - RTT);
+       RTT_weak  = (1 - ALPHA) * RTT_weak + ALPHA * RTT;
+       E_weak = RTT_weak  + 1 * RTTVAR_weak;
+       RTO_new = W_WEAK * E_weak + (1 - W_WEAK) * RTO_previous
+   }
+}
 
 B.2.  RTO aging
 
-   checkAging(destination) { clock_time difference = getCurrentTime() -
-   lastUpdatedTime(destination);
 
-   if ((currentRTO(destination) < 1s) && (difference > (16 *
-   currentRTO(destination)) { currentRTO(destination) = 2 *
-   currentRTO(destination); lastUpdated(destination) = getCurrentTime();
-   } else if ((currentRTO(destination) > 3s) && (difference > (4 *
-   currentRTO(destination)) { currentRTO(destination) = 1s + 0.5 *
-   currentRTO(destination); lastUpdated(destination) = getCurrentTime();
-   } }
+
+
+
+
+
+
+
+
+
+
+
+Bormann, et al.            Expires May 2, 2018                 [Page 13]
+
+Internet-Draft              CoAP Simple CoCoA               October 2017
+
+
+   checkAging() {
+      clock_time difference = getCurrentTime() - lastUpdatedTime;
+
+      if ((RTO < 1s) && (difference > (16 * RTO) {
+       RTO = 2 * RTO;
+       lastUpdatedTime = getCurrentTime();
+      } else if ((RTO > 3s) && (difference > (4 * RTO) {
+       RTO = 1s + 0.5 * RTO;
+       lastUpdatedTime = getCurrentTime();
+      }
+   }
 
 Appendix C.  Examples
 
@@ -722,14 +751,6 @@ C.1.  Example A.1: weak RTTs
    sensor readings via CON messages every 20 s in an asynchronous way
    towards a server located behind a gateway, obtaining strong RTT
    measurements (RTT 1.1 s, RTTVAR 0.1 s) that lead to the calculation
-
-
-
-Bormann, et al.            Expires May 2, 2018                 [Page 13]
-
-Internet-Draft              CoAP Simple CoCoA               October 2017
-
-
    of an RTO of 1.5 s (in average) in each node.  In this mode of
    operation, no aging is applied, since the RTO is refreshed before the
    aging mechanism applies.
@@ -755,6 +776,16 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    1.  Further spurious retransmissions are avoided as the RTO has
        increased above the real RTT.
 
+
+
+
+
+
+Bormann, et al.            Expires May 2, 2018                 [Page 14]
+
+Internet-Draft              CoAP Simple CoCoA               October 2017
+
+
    2.  The increase of RTOs across the whole network reduces the rate
        with which retransmissions are generated, decreasing the network
        congestion (which leads to an RTT and packet loss decrease).
@@ -778,14 +809,6 @@ C.3.  Example B: VBF and aging
    transmitting CON messages every 1 s.  Suddenly, the connection
    quality gets worse and the nodes switch to a more stable, yet slower
    connection via GPRS.  As a result of this change, the nodes run into
-
-
-
-Bormann, et al.            Expires May 2, 2018                 [Page 14]
-
-Internet-Draft              CoAP Simple CoCoA               October 2017
-
-
    retransmissions, as the real RTT has increased above the calculated
    RTO.
 
@@ -811,6 +834,14 @@ Appendix D.  Analysis: difference between strong and weak estimators
    (according to [RFC6298], and SRTT=R'), G would be dominant term in
    the max(G, K * RTTVAR) expression in the long run.
 
+
+
+
+Bormann, et al.            Expires May 2, 2018                 [Page 15]
+
+Internet-Draft              CoAP Simple CoCoA               October 2017
+
+
    For the weak estimator: assume that the RTO setting converges to
    E_strong_ calculated above in the long run.  If there is a packet
    loss, and an RTT is obtained for the first retransmission, then the
@@ -834,14 +865,6 @@ Acknowledgements
    during IETF84, including Lars Eggert, Michael Scharf, and David
    Black.  Andrew McGregor, Eric Rescorla, Richard Kelsey, Ed Beroset,
    Jari Arkko, Zach Shelby, Matthias Kovatsch and many others provided
-
-
-
-Bormann, et al.            Expires May 2, 2018                 [Page 15]
-
-Internet-Draft              CoAP Simple CoCoA               October 2017
-
-
    very useful additions.  Further reviews by Michael Scharf and Ingemar
    Johansson led to further improvements, including some more discussion
    in the appendices.
@@ -859,6 +882,21 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    with Prof. Jon Crowcroft.
 
 Authors' Addresses
+
+
+
+
+
+
+
+
+
+
+
+Bormann, et al.            Expires May 2, 2018                 [Page 16]
+
+Internet-Draft              CoAP Simple CoCoA               October 2017
+
 
    Carsten Bormann
    Universitaet Bremen TZI
@@ -892,12 +930,6 @@ Authors' Addresses
    Email: carlesgo@entel.upc.edu
 
 
-
-Bormann, et al.            Expires May 2, 2018                 [Page 16]
-
-Internet-Draft              CoAP Simple CoCoA               October 2017
-
-
    Ilker Demirkol
    Universitat Politecnica de Catalunya/Fundacio i2CAT
    Departament d'Enginyeria Telematica
@@ -906,38 +938,6 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    Spain
 
    Email: ilker.demirkol@entel.upc.edu
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

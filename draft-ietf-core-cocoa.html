@@ -660,12 +660,43 @@ address {
 <h1 id="rfc.appendix.B.1">
 <a href="#rfc.appendix.B.1">B.1.</a> <a href="#pseudo-rto" id="pseudo-rto">Updating the RTO estimator</a>
 </h1>
-<p id="rfc.section.B.1.p.1">updateRTO(retransmissions, RTT) { if(retransmissions == 0) { RTTVAR_strong = (1 - BETA) * RTTVAR_strong + BETA (RTT_strong_old - RTT); RTT_strong  = (1-ALPHA) * RTT_old + ALPHA * RTT; E_strong = RTT_strong  + 4 * RTTVAR_strong; RTO_new = 0.5 * E_strong + 0.5 RTO_previous; } else if (retransmissions &lt;= 2) { RTTVAR_weak = (1 - BETA) * RTTVAR_weak + BETA (RTT_weak_old - RTT); RTT_weak  = (1-ALPHA) * RTT_weak + ALPHA * RTT; E_weak = RTT_weak  + 1 * RTTVAR_weak; RTO_new = 0.25 * E_weak } }</p>
+<pre>
+// Default values
+ALPHA = 0.125 // RFC 6298
+BETA = 0.25 // RFC 6298
+W_STRONG = 0.5
+W_WEAK = 0.25
+
+updateRTO(retransmissions, RTT) {
+   if (retransmissions == 0) {
+       RTTVAR_strong = (1 - BETA) * RTTVAR_strong + BETA * (RTT_strong - RTT);
+       RTT_strong  = (1 - ALPHA) * RTT_strong + ALPHA * RTT;
+       E_strong = RTT_strong  + 4 * RTTVAR_strong;
+       RTO_new = W_STRONG * E_strong + (1 - W_STRONG) * RTO_previous;
+   } else if (retransmissions &lt;= 2) {
+       RTTVAR_weak = (1 - BETA) * RTTVAR_weak + BETA (RTT_weak - RTT);
+       RTT_weak  = (1 - ALPHA) * RTT_weak + ALPHA * RTT;
+       E_weak = RTT_weak  + 1 * RTTVAR_weak;
+       RTO_new = W_WEAK * E_weak + (1 - W_WEAK) * RTO_previous
+   }
+}
+</pre>
 <h1 id="rfc.appendix.B.2">
 <a href="#rfc.appendix.B.2">B.2.</a> <a href="#pseudo-aging" id="pseudo-aging">RTO aging</a>
 </h1>
-<p id="rfc.section.B.2.p.1">checkAging(destination) { clock_time difference = getCurrentTime() - lastUpdatedTime(destination);</p>
-<p id="rfc.section.B.2.p.2">if ((currentRTO(destination) &lt; 1s) &amp;&amp; (difference &gt; (16 * currentRTO(destination)) { currentRTO(destination) = 2 * currentRTO(destination); lastUpdated(destination) = getCurrentTime(); } else if ((currentRTO(destination) &gt; 3s) &amp;&amp; (difference &gt; (4 * currentRTO(destination)) { currentRTO(destination) = 1s + 0.5 * currentRTO(destination); lastUpdated(destination) = getCurrentTime(); } }</p>
+<pre>
+checkAging() {
+   clock_time difference = getCurrentTime() - lastUpdatedTime;
+
+   if ((RTO &lt; 1s) &amp;&amp; (difference &gt; (16 * RTO) {
+    RTO = 2 * RTO;
+    lastUpdatedTime = getCurrentTime();
+   } else if ((RTO &gt; 3s) &amp;&amp; (difference &gt; (4 * RTO) {
+    RTO = 1s + 0.5 * RTO;
+    lastUpdatedTime = getCurrentTime();
+   }
+}
+</pre>
 <h1 id="rfc.appendix.C">
 <a href="#rfc.appendix.C">Appendix C.</a> <a href="#examples" id="examples">Examples</a>
 </h1>
