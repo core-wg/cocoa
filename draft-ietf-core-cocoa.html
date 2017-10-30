@@ -298,6 +298,7 @@ address {
 <link href="#rfc.appendix.B" rel="Chapter" title="B Pseudocode">
 <link href="#rfc.appendix.B.1" rel="Chapter" title="B.1 Updating the RTO estimator">
 <link href="#rfc.appendix.B.2" rel="Chapter" title="B.2 RTO aging">
+<link href="#rfc.appendix.B.3" rel="Chapter" title="B.3 Variable Backoff Factor">
 <link href="#rfc.appendix.C" rel="Chapter" title="C Examples">
 <link href="#rfc.appendix.C.1" rel="Chapter" title="C.1 Example A.1: weak RTTs">
 <link href="#rfc.appendix.C.2" rel="Chapter" title="C.2 Example A.2: VBF and aging">
@@ -426,6 +427,8 @@ address {
 </li>
 <li>B.2.   <a href="#rfc.appendix.B.2">RTO aging</a>
 </li>
+<li>B.3.   <a href="#rfc.appendix.B.3">Variable Backoff Factor</a>
+</li>
 </ul><li>Appendix C.   <a href="#rfc.appendix.C">Examples</a>
 </li>
 <ul><li>C.1.   <a href="#rfc.appendix.C.1">Example A.1: weak RTTs</a>
@@ -505,9 +508,10 @@ address {
 <p id="rfc.section.4.2.1.p.1">This subsection presents three differences of the algorithm defined in this document with the one defined in <a href="#RFC6298" class="xref">[RFC6298]</a>.  The first two recommend new parameter settings.  The third one is the variable backoff factor mechanism.</p>
 <p id="rfc.section.4.2.1.p.2">The initial value for each of the two RTO estimators is 2 s.</p>
 <p id="rfc.section.4.2.1.p.3">For the weak estimator, the factor K (the RTT variance multiplier) is set to 1 instead of 4.  This is necessary to avoid a strong increase of the RTO in the case that the RTTVAR value is very large, which may be the case if a weak RTT measurement is obtained after one or more retransmissions.</p>
-<p id="rfc.section.4.2.1.p.4">In order to avoid that exchanges with small initial RTOs (i.e. RTO estimate lower than 1 s) use up all retransmissions in a short interval of time, the RTO for a retransmission is multiplied by 3 for each retransmission.</p>
-<p id="rfc.section.4.2.1.p.5">On the other hand, to avoid exchanges with large initial RTOs (i.e., RTO estimate greater than 3 s) not being able to carry out all retransmissions within MAX_TRANSMIT_WAIT (normally 93 s), the RTO is then multiplied only by 1.5 instead.</p>
-<p id="rfc.section.4.2.1.p.6">The binary exponential backoff is truncated at 32 seconds.  Similar to the way retransmissions are handled in the base specification, they are dithered between 1 x RTO and ACK_RANDOM_FACTOR x RTO.</p>
+<p id="rfc.section.4.2.1.p.4">In order to avoid that exchanges with small initial RTOs (i.e. RTO estimate lower than 1 s) use up all retransmissions in a short interval of time, the RTO for a retransmission is multiplied by 3 for each retransmission as long as the RTO is less than 1&#160;s.</p>
+<p id="rfc.section.4.2.1.p.5">On the other hand, to avoid exchanges with large initial RTOs (i.e., RTO estimate greater than 3 s) not being able to carry out all retransmissions within MAX_TRANSMIT_WAIT (normally 93 s), the RTO is multiplied only by 1.5 when RTO is greater than 3&#160;s.</p>
+<p id="rfc.section.4.2.1.p.6">Pseudocode for the variable backoff factor is in <a href="#pseudo-vbf" class="xref">Appendix B.3</a>.</p>
+<p id="rfc.section.4.2.1.p.7">The binary exponential backoff is truncated at 32 seconds.  Similar to the way retransmissions are handled in the base specification, they are dithered between 1 x RTO and ACK_RANDOM_FACTOR x RTO.</p>
 <h1 id="rfc.section.4.2.2">
 <a href="#rfc.section.4.2.2">4.2.2.</a> <a href="#discussion" id="discussion">Discussion</a>
 </h1>
@@ -668,17 +672,19 @@ W_STRONG = 0.5
 W_WEAK = 0.25
 
 updateRTO(retransmissions, RTT) {
-   if (retransmissions == 0) {
-       RTTVAR_strong = (1 - BETA) * RTTVAR_strong + BETA * (RTT_strong - RTT);
-       RTT_strong  = (1 - ALPHA) * RTT_strong + ALPHA * RTT;
-       E_strong = RTT_strong  + 4 * RTTVAR_strong;
-       RTO_new = W_STRONG * E_strong + (1 - W_STRONG) * RTO_previous;
-   } else if (retransmissions &lt;= 2) {
-       RTTVAR_weak = (1 - BETA) * RTTVAR_weak + BETA (RTT_weak - RTT);
-       RTT_weak  = (1 - ALPHA) * RTT_weak + ALPHA * RTT;
-       E_weak = RTT_weak  + 1 * RTTVAR_weak;
-       RTO_new = W_WEAK * E_weak + (1 - W_WEAK) * RTO_previous
-   }
+  if (retransmissions == 0) {
+    RTTVAR_strong = (1 - BETA) * RTTVAR_strong
+                  + BETA * (RTT_strong - RTT);
+    RTT_strong  = (1 - ALPHA) * RTT_strong + ALPHA * RTT;
+    E_strong = RTT_strong  + 4 * RTTVAR_strong;
+    RTO_new = W_STRONG * E_strong + (1 - W_STRONG) * RTO_previous;
+  } else if (retransmissions &lt;= 2) {
+    RTTVAR_weak = (1 - BETA) * RTTVAR_weak
+                + BETA * (RTT_weak - RTT);
+    RTT_weak  = (1 - ALPHA) * RTT_weak + ALPHA * RTT;
+    E_weak = RTT_weak  + 1 * RTTVAR_weak;
+    RTO_new = W_WEAK * E_weak + (1 - W_WEAK) * RTO_previous
+  }
 }
 </pre>
 <h1 id="rfc.appendix.B.2">
@@ -686,15 +692,29 @@ updateRTO(retransmissions, RTT) {
 </h1>
 <pre>
 checkAging() {
-   clock_time difference = getCurrentTime() - lastUpdatedTime;
+  clock_time difference = getCurrentTime() - lastUpdatedTime;
 
-   if ((RTO &lt; 1s) &amp;&amp; (difference &gt; (16 * RTO) {
+  if ((RTO &lt; 1s) &amp;&amp; (difference &gt; (16 * RTO))) {
     RTO = 2 * RTO;
     lastUpdatedTime = getCurrentTime();
-   } else if ((RTO &gt; 3s) &amp;&amp; (difference &gt; (4 * RTO) {
+  } else if ((RTO &gt; 3s) &amp;&amp; (difference &gt; (4 * RTO))) {
     RTO = 1s + 0.5 * RTO;
     lastUpdatedTime = getCurrentTime();
-   }
+  }
+}
+</pre>
+<h1 id="rfc.appendix.B.3">
+<a href="#rfc.appendix.B.3">B.3.</a> <a href="#pseudo-vbf" id="pseudo-vbf">Variable Backoff Factor</a>
+</h1>
+<pre>
+backOffRTO() {
+  if (RTO &lt; 1s) {
+    RTO = RTO * 3;
+  } else if (RTO &gt; 3s) {
+    RTO = RTO * 1.5;
+  } else {
+    RTO = RTO * 2;
+  }
 }
 </pre>
 <h1 id="rfc.appendix.C">

@@ -80,32 +80,32 @@ Table of Contents
    2.  Context . . . . . . . . . . . . . . . . . . . . . . . . . . .   4
    3.  Area of Applicability . . . . . . . . . . . . . . . . . . . .   4
    4.  Advanced CoAP Congestion Control: RTO Estimation  . . . . . .   5
-     4.1.  Blind RTO Estimate  . . . . . . . . . . . . . . . . . . .   5
+     4.1.  Blind RTO Estimate  . . . . . . . . . . . . . . . . . . .   6
      4.2.  Measured RTO Estimate . . . . . . . . . . . . . . . . . .   6
-       4.2.1.  Differences with the algorithm of RFC 6298  . . . . .   6
+       4.2.1.  Differences with the algorithm of RFC 6298  . . . . .   7
        4.2.2.  Discussion  . . . . . . . . . . . . . . . . . . . . .   7
      4.3.  Lifetime, Aging . . . . . . . . . . . . . . . . . . . . .   8
    5.  Advanced CoAP Congestion Control: Non-Confirmables  . . . . .   8
      5.1.  Discussion  . . . . . . . . . . . . . . . . . . . . . . .   9
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
    7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
-   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .   9
-     8.1.  Normative References  . . . . . . . . . . . . . . . . . .   9
+   8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
+     8.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
      8.2.  Informative References  . . . . . . . . . . . . . . . . .  10
    Appendix A.  Supporting evidence  . . . . . . . . . . . . . . . .  11
      A.1.  Older versions of the draft and improvement . . . . . . .  12
      A.2.  References  . . . . . . . . . . . . . . . . . . . . . . .  12
    Appendix B.  Pseudocode . . . . . . . . . . . . . . . . . . . . .  13
      B.1.  Updating the RTO estimator  . . . . . . . . . . . . . . .  13
-     B.2.  RTO aging . . . . . . . . . . . . . . . . . . . . . . . .  13
+     B.2.  RTO aging . . . . . . . . . . . . . . . . . . . . . . . .  14
+     B.3.  Variable Backoff Factor . . . . . . . . . . . . . . . . .  14
    Appendix C.  Examples . . . . . . . . . . . . . . . . . . . . . .  14
      C.1.  Example A.1: weak RTTs  . . . . . . . . . . . . . . . . .  14
      C.2.  Example A.2: VBF and aging  . . . . . . . . . . . . . . .  15
      C.3.  Example B: VBF and aging  . . . . . . . . . . . . . . . .  15
    Appendix D.  Analysis: difference between strong and weak
-                estimators . . . . . . . . . . . . . . . . . . . . .  15
+                estimators . . . . . . . . . . . . . . . . . . . . .  16
    Acknowledgements  . . . . . . . . . . . . . . . . . . . . . . . .  16
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  16
 
 
 
@@ -113,6 +113,8 @@ Bormann, et al.            Expires May 2, 2018                  [Page 2]
 
 Internet-Draft              CoAP Simple CoCoA               October 2017
 
+
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
 
 1.  Introduction
 
@@ -158,9 +160,7 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
-   (Note that the present document is itself informational, but it is
-   discussing normative statements about behavior that makes the
-   congestion control scheme work in a safe manner.)
+
 
 
 
@@ -169,6 +169,10 @@ Bormann, et al.            Expires May 2, 2018                  [Page 3]
 
 Internet-Draft              CoAP Simple CoCoA               October 2017
 
+
+   (Note that the present document is itself informational, but it is
+   discussing normative statements about behavior that makes the
+   congestion control scheme work in a safe manner.)
 
    The term "byte", abbreviated by "B", is used in its now customary
    sense as a synonym for "octet".
@@ -214,10 +218,6 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    the state needed to do RTT measurements, so it may not be applicable
    to the most constrained devices (class 1 as per [RFC7228]).
 
-   The scope of each instance of the algorithm in the current set of
-   evaluations has been the five-tuple, i.e., CoAP + endpoint (transport
-   address) for Initiator and Responder.  Potential applicability to
-   larger scopes needs to be examined.
 
 
 
@@ -225,6 +225,11 @@ Bormann, et al.            Expires May 2, 2018                  [Page 4]
 
 Internet-Draft              CoAP Simple CoCoA               October 2017
 
+
+   The scope of each instance of the algorithm in the current set of
+   evaluations has been the five-tuple, i.e., CoAP + endpoint (transport
+   address) for Initiator and Responder.  Potential applicability to
+   larger scopes needs to be examined.
 
 4.  Advanced CoAP Congestion Control: RTO Estimation
 
@@ -268,11 +273,6 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    used to reduce the amount of state in an initiator is for further
    study.
 
-4.1.  Blind RTO Estimate
-
-   The initial RTO estimate for an endpoint is set to 2 seconds (the
-   initial RTO estimate is used as the initial value for both E_weak_
-   and E_strong_ below).
 
 
 
@@ -281,6 +281,12 @@ Bormann, et al.            Expires May 2, 2018                  [Page 5]
 
 Internet-Draft              CoAP Simple CoCoA               October 2017
 
+
+4.1.  Blind RTO Estimate
+
+   The initial RTO estimate for an endpoint is set to 2 seconds (the
+   initial RTO estimate is used as the initial value for both E_weak_
+   and E_strong_ below).
 
    If only the initial RTO estimate is available, the RTO estimate for
    each of up to NSTART exchanges started in parallel is set to 2 s
@@ -321,14 +327,8 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    for the overall RTO estimate presented are available in Appendix B.1
    and Appendix C.1.
 
-4.2.1.  Differences with the algorithm of RFC 6298
 
-   This subsection presents three differences of the algorithm defined
-   in this document with the one defined in [RFC6298].  The first two
-   recommend new parameter settings.  The third one is the variable
-   backoff factor mechanism.
 
-   The initial value for each of the two RTO estimators is 2 s.
 
 
 
@@ -337,6 +337,15 @@ Bormann, et al.            Expires May 2, 2018                  [Page 6]
 
 Internet-Draft              CoAP Simple CoCoA               October 2017
 
+
+4.2.1.  Differences with the algorithm of RFC 6298
+
+   This subsection presents three differences of the algorithm defined
+   in this document with the one defined in [RFC6298].  The first two
+   recommend new parameter settings.  The third one is the variable
+   backoff factor mechanism.
+
+   The initial value for each of the two RTO estimators is 2 s.
 
    For the weak estimator, the factor K (the RTT variance multiplier) is
    set to 1 instead of 4.  This is necessary to avoid a strong increase
@@ -347,12 +356,14 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    In order to avoid that exchanges with small initial RTOs (i.e.  RTO
    estimate lower than 1 s) use up all retransmissions in a short
    interval of time, the RTO for a retransmission is multiplied by 3 for
-   each retransmission.
+   each retransmission as long as the RTO is less than 1 s.
 
    On the other hand, to avoid exchanges with large initial RTOs (i.e.,
    RTO estimate greater than 3 s) not being able to carry out all
    retransmissions within MAX_TRANSMIT_WAIT (normally 93 s), the RTO is
-   then multiplied only by 1.5 instead.
+   multiplied only by 1.5 when RTO is greater than 3 s.
+
+   Pseudocode for the variable backoff factor is in Appendix B.3.
 
    The binary exponential backoff is truncated at 32 seconds.  Similar
    to the way retransmissions are handled in the base specification,
@@ -375,17 +386,6 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    congestion-induced losses.  In presence of the latter, spurious
    timeouts are avoided and the rate of retries is reduced, which allows
    to decrease congestion.  Evidence that has been collected from
-   experiments appears to support that the overall effect of using this
-   data in the way described is beneficial (Appendix A).
-
-   Some evaluation has been done on earlier versions of this
-   specification [Betzler2013].  A more recent (and more comprehensive)
-   reference is [Betzler2015].
-
-
-
-
-
 
 
 
@@ -393,6 +393,13 @@ Bormann, et al.            Expires May 2, 2018                  [Page 7]
 
 Internet-Draft              CoAP Simple CoCoA               October 2017
 
+
+   experiments appears to support that the overall effect of using this
+   data in the way described is beneficial (Appendix A).
+
+   Some evaluation has been done on earlier versions of this
+   specification [Betzler2013].  A more recent (and more comprehensive)
+   reference is [Betzler2015].
 
 4.3.  Lifetime, Aging
 
@@ -434,13 +441,6 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
        responses or acknowledgments, at least 2 of the messages must be
        confirmable.
 
-   2.  An RTO as specified in Section 4 must be used for confirmable
-       messages.
-
-   3.  The packet rate of non-confirmable messages cannot exceed 1/RTO,
-       where RTO is the overall RTO estimator value at the time the non-
-       confirmable packet is sent.
-
 
 
 
@@ -449,6 +449,13 @@ Bormann, et al.            Expires May 2, 2018                  [Page 8]
 
 Internet-Draft              CoAP Simple CoCoA               October 2017
 
+
+   2.  An RTO as specified in Section 4 must be used for confirmable
+       messages.
+
+   3.  The packet rate of non-confirmable messages cannot exceed 1/RTO,
+       where RTO is the overall RTO estimator value at the time the non-
+       confirmable packet is sent.
 
 5.1.  Discussion
 
@@ -489,14 +496,7 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    allowing to keep the RTO updated, which in turn allows recovery from
    a jamming attack in reasonable time.
 
-8.  References
 
-8.1.  Normative References
-
-   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
-              Requirement Levels", BCP 14, RFC 2119,
-              DOI 10.17487/RFC2119, March 1997,
-              <https://www.rfc-editor.org/info/rfc2119>.
 
 
 
@@ -505,6 +505,15 @@ Bormann, et al.            Expires May 2, 2018                  [Page 9]
 
 Internet-Draft              CoAP Simple CoCoA               October 2017
 
+
+8.  References
+
+8.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/info/rfc2119>.
 
    [RFC2914]  Floyd, S., "Congestion Control Principles", BCP 41,
               RFC 2914, DOI 10.17487/RFC2914, September 2000,
@@ -542,15 +551,6 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
               CoAP", Ad Hoc Networks Vol. 33 pp. 126-139,
               DOI 10.1016/j.adhoc.2015.04.007, October 2015.
 
-   [I-D.bormann-core-congestion-control]
-              Bormann, C. and K. Hartke, "Congestion Control Principles
-              for CoAP", draft-bormann-core-congestion-control-02 (work
-              in progress), July 2012.
-
-   [I-D.eggert-core-congestion-control]
-              Eggert, L., "Congestion Control for the Constrained
-              Application Protocol (CoAP)", draft-eggert-core-
-              congestion-control-01 (work in progress), January 2011.
 
 
 
@@ -561,6 +561,16 @@ Bormann, et al.            Expires May 2, 2018                 [Page 10]
 
 Internet-Draft              CoAP Simple CoCoA               October 2017
 
+
+   [I-D.bormann-core-congestion-control]
+              Bormann, C. and K. Hartke, "Congestion Control Principles
+              for CoAP", draft-bormann-core-congestion-control-02 (work
+              in progress), July 2012.
+
+   [I-D.eggert-core-congestion-control]
+              Eggert, L., "Congestion Control for the Constrained
+              Application Protocol (CoAP)", draft-eggert-core-
+              congestion-control-01 (work in progress), January 2011.
 
    [RFC5348]  Floyd, S., Handley, M., Padhye, J., and J. Widmer, "TCP
               Friendly Rate Control (TFRC): Protocol Specification",
@@ -600,6 +610,14 @@ Appendix A.  Supporting evidence
    testebds that in these settings, in comparison to default CoAP, CoCoA
    increases throughput and reduces the time it takes for a network to
    process traffic bursts, while not sacrificing fairness.  In contrast,
+
+
+
+Bormann, et al.            Expires May 2, 2018                 [Page 11]
+
+Internet-Draft              CoAP Simple CoCoA               October 2017
+
+
    other RTT-sensitive approaches such as Linux-RTO or Peak-Hopper-RTO
    may be too simple or do not adapt well to IoT scenarios,
    underperforming default CoAP under certain conditions [1].  On the
@@ -610,14 +628,6 @@ Appendix A.  Supporting evidence
    over emulated GPRS/UMTS links and over a real IEEE 802.15.4 mesh
    testbed.  Results show that since CoCoA is adaptive, it yields better
    packet delivery ratio than default CoAP (which does not apply
-
-
-
-Bormann, et al.            Expires May 2, 2018                 [Page 11]
-
-Internet-Draft              CoAP Simple CoCoA               October 2017
-
-
    congestion control to non-confirmable messages) or Observe (which
    introduces congestion control that is not adaptive to network
    conditions) [3, 4].
@@ -656,6 +666,14 @@ A.2.  References
 
    [6] A.  Betzler, C.  Gomez, I.  Demirkol, M.  Kovatsch, "Congestion
    Control for CoAP cloud services", 8th International Workshop on
+
+
+
+Bormann, et al.            Expires May 2, 2018                 [Page 12]
+
+Internet-Draft              CoAP Simple CoCoA               October 2017
+
+
    Service-Oriented Cyber-Physical Systems in Converging Networked
    Environments (SOCNE) 2014, Barcelona, Spain, Sept. 2014.
 
@@ -665,15 +683,6 @@ A.2.  References
 
    [8] Bhalerao, Rahul, Sridhar Srinivasa Subramanian, and Joseph
    Pasquale.  "An analysis and improvement of congestion control in the
-
-
-
-
-Bormann, et al.            Expires May 2, 2018                 [Page 12]
-
-Internet-Draft              CoAP Simple CoCoA               October 2017
-
-
    CoAP Internet-of-Things protocol." 2016 13th IEEE Annual Consumer
    Communications & Networking Conference (CCNC).  IEEE, 2016.
 
@@ -691,36 +700,27 @@ Appendix B.  Pseudocode
 
 B.1.  Updating the RTO estimator
 
-// Default values
-ALPHA = 0.125 // RFC 6298
-BETA = 0.25 // RFC 6298
-W_STRONG = 0.5
-W_WEAK = 0.25
+   // Default values
+   ALPHA = 0.125 // RFC 6298
+   BETA = 0.25 // RFC 6298
+   W_STRONG = 0.5
+   W_WEAK = 0.25
 
-updateRTO(retransmissions, RTT) {
-   if (retransmissions == 0) {
-       RTTVAR_strong = (1 - BETA) * RTTVAR_strong + BETA * (RTT_strong - RTT);
+   updateRTO(retransmissions, RTT) {
+     if (retransmissions == 0) {
+       RTTVAR_strong = (1 - BETA) * RTTVAR_strong
+                     + BETA * (RTT_strong - RTT);
        RTT_strong  = (1 - ALPHA) * RTT_strong + ALPHA * RTT;
        E_strong = RTT_strong  + 4 * RTTVAR_strong;
        RTO_new = W_STRONG * E_strong + (1 - W_STRONG) * RTO_previous;
-   } else if (retransmissions <= 2) {
-       RTTVAR_weak = (1 - BETA) * RTTVAR_weak + BETA (RTT_weak - RTT);
+     } else if (retransmissions <= 2) {
+       RTTVAR_weak = (1 - BETA) * RTTVAR_weak
+                   + BETA * (RTT_weak - RTT);
        RTT_weak  = (1 - ALPHA) * RTT_weak + ALPHA * RTT;
        E_weak = RTT_weak  + 1 * RTTVAR_weak;
        RTO_new = W_WEAK * E_weak + (1 - W_WEAK) * RTO_previous
+     }
    }
-}
-
-B.2.  RTO aging
-
-
-
-
-
-
-
-
-
 
 
 
@@ -730,16 +730,30 @@ Bormann, et al.            Expires May 2, 2018                 [Page 13]
 Internet-Draft              CoAP Simple CoCoA               October 2017
 
 
-   checkAging() {
-      clock_time difference = getCurrentTime() - lastUpdatedTime;
+B.2.  RTO aging
 
-      if ((RTO < 1s) && (difference > (16 * RTO) {
+   checkAging() {
+     clock_time difference = getCurrentTime() - lastUpdatedTime;
+
+     if ((RTO < 1s) && (difference > (16 * RTO))) {
        RTO = 2 * RTO;
        lastUpdatedTime = getCurrentTime();
-      } else if ((RTO > 3s) && (difference > (4 * RTO) {
+     } else if ((RTO > 3s) && (difference > (4 * RTO))) {
        RTO = 1s + 0.5 * RTO;
        lastUpdatedTime = getCurrentTime();
-      }
+     }
+   }
+
+B.3.  Variable Backoff Factor
+
+   backOffRTO() {
+     if (RTO < 1s) {
+       RTO = RTO * 3;
+     } else if (RTO > 3s) {
+       RTO = RTO * 1.5;
+     } else {
+       RTO = RTO * 2;
+     }
    }
 
 Appendix C.  Examples
@@ -764,6 +778,14 @@ C.1.  Example A.1: weak RTTs
    more), many nodes are not able to update their RTO via strong RTT
    measurements, but they are able to obtain weak RTT measurements.  A
    node with an initial RTO of 1.5 s would run into a retransmission,
+
+
+
+Bormann, et al.            Expires May 2, 2018                 [Page 14]
+
+Internet-Draft              CoAP Simple CoCoA               October 2017
+
+
    before obtaining an ACK (given the RTT of 2 s and that the ACK is not
    lost).
 
@@ -775,16 +797,6 @@ C.1.  Example A.1: weak RTTs
 
    1.  Further spurious retransmissions are avoided as the RTO has
        increased above the real RTT.
-
-
-
-
-
-
-Bormann, et al.            Expires May 2, 2018                 [Page 14]
-
-Internet-Draft              CoAP Simple CoCoA               October 2017
-
 
    2.  The increase of RTOs across the whole network reduces the rate
        with which retransmissions are generated, decreasing the network
@@ -822,6 +834,14 @@ C.3.  Example B: VBF and aging
    and the aging mechanism, the number of spurious retransmissions would
    be much higher and the RTO would be corrected more slowly.
 
+
+
+
+Bormann, et al.            Expires May 2, 2018                 [Page 15]
+
+Internet-Draft              CoAP Simple CoCoA               October 2017
+
+
 Appendix D.  Analysis: difference between strong and weak estimators
 
    This section analyzes the difference between the strong and weak RTO
@@ -833,14 +853,6 @@ Appendix D.  Analysis: difference between strong and weak estimators
    since RTTVAR is reduced constantly by RTTVAR = RTTVAR * 3/4
    (according to [RFC6298], and SRTT=R'), G would be dominant term in
    the max(G, K * RTTVAR) expression in the long run.
-
-
-
-
-Bormann, et al.            Expires May 2, 2018                 [Page 15]
-
-Internet-Draft              CoAP Simple CoCoA               October 2017
-
 
    For the weak estimator: assume that the RTO setting converges to
    E_strong_ calculated above in the long run.  If there is a packet
@@ -878,18 +890,6 @@ Acknowledgements
    (Ministerio de Educacion, Cultura y Deporte) through the Jose
    Castillejo grant CAS15/00336.  His contribution to this work has been
    carried out in part during his stay as a visiting scholar at the
-   Computer Laboratory of the University of Cambridge, in collaboration
-   with Prof. Jon Crowcroft.
-
-Authors' Addresses
-
-
-
-
-
-
-
-
 
 
 
@@ -897,6 +897,11 @@ Bormann, et al.            Expires May 2, 2018                 [Page 16]
 
 Internet-Draft              CoAP Simple CoCoA               October 2017
 
+
+   Computer Laboratory of the University of Cambridge, in collaboration
+   with Prof. Jon Crowcroft.
+
+Authors' Addresses
 
    Carsten Bormann
    Universitaet Bremen TZI
@@ -938,11 +943,6 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    Spain
 
    Email: ilker.demirkol@entel.upc.edu
-
-
-
-
-
 
 
 
