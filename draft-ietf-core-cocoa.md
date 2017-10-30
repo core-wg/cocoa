@@ -334,12 +334,15 @@ retransmissions.
 
 In order to avoid that exchanges with small initial RTOs (i.e. RTO estimate lower
 than 1 s) use up all retransmissions in a short interval of time, the RTO for
-a retransmission is multiplied by 3 for each retransmission.
+a retransmission is multiplied by 3 for each retransmission as long as
+the RTO is less than 1 s.
 
 On the other hand, to avoid exchanges with large initial RTOs
 (i.e., RTO estimate greater than 3 s) not being able to carry out all
-retransmissions within MAX_TRANSMIT_WAIT (normally 93 s), the RTO is then
-multiplied only by 1.5 instead.
+retransmissions within MAX_TRANSMIT_WAIT (normally 93 s), the RTO is
+multiplied only by 1.5 when RTO is greater than 3 s.
+
+Pseudocode for the variable backoff factor is in {{pseudo-vbf}}.
 
 The binary exponential backoff is truncated at 32 seconds.
 Similar to the way retransmissions are handled in the base specification, they
@@ -561,17 +564,19 @@ W_STRONG = 0.5
 W_WEAK = 0.25
 
 updateRTO(retransmissions, RTT) {
-   if (retransmissions == 0) {
-       RTTVAR_strong = (1 - BETA) * RTTVAR_strong + BETA * (RTT_strong - RTT);
-       RTT_strong  = (1 - ALPHA) * RTT_strong + ALPHA * RTT;
-       E_strong = RTT_strong  + 4 * RTTVAR_strong;
-       RTO_new = W_STRONG * E_strong + (1 - W_STRONG) * RTO_previous;
-   } else if (retransmissions <= 2) {
-       RTTVAR_weak = (1 - BETA) * RTTVAR_weak + BETA (RTT_weak - RTT);
-       RTT_weak  = (1 - ALPHA) * RTT_weak + ALPHA * RTT;
-       E_weak = RTT_weak  + 1 * RTTVAR_weak;
-       RTO_new = W_WEAK * E_weak + (1 - W_WEAK) * RTO_previous
-   }
+  if (retransmissions == 0) {
+    RTTVAR_strong = (1 - BETA) * RTTVAR_strong
+                  + BETA * (RTT_strong - RTT);
+    RTT_strong  = (1 - ALPHA) * RTT_strong + ALPHA * RTT;
+    E_strong = RTT_strong  + 4 * RTTVAR_strong;
+    RTO_new = W_STRONG * E_strong + (1 - W_STRONG) * RTO_previous;
+  } else if (retransmissions <= 2) {
+    RTTVAR_weak = (1 - BETA) * RTTVAR_weak
+                + BETA * (RTT_weak - RTT);
+    RTT_weak  = (1 - ALPHA) * RTT_weak + ALPHA * RTT;
+    E_weak = RTT_weak  + 1 * RTTVAR_weak;
+    RTO_new = W_WEAK * E_weak + (1 - W_WEAK) * RTO_previous
+  }
 }
 ~~~~
 
@@ -579,15 +584,29 @@ updateRTO(retransmissions, RTT) {
 
 ~~~~
 checkAging() {
-   clock_time difference = getCurrentTime() - lastUpdatedTime;
+  clock_time difference = getCurrentTime() - lastUpdatedTime;
 
-   if ((RTO < 1s) && (difference > (16 * RTO) {
+  if ((RTO < 1s) && (difference > (16 * RTO))) {
     RTO = 2 * RTO;
     lastUpdatedTime = getCurrentTime();
-   } else if ((RTO > 3s) && (difference > (4 * RTO) {
+  } else if ((RTO > 3s) && (difference > (4 * RTO))) {
     RTO = 1s + 0.5 * RTO;
     lastUpdatedTime = getCurrentTime();
-   }
+  }
+}
+~~~~
+
+## Variable Backoff Factor {#pseudo-vbf}
+
+~~~~
+backOffRTO() {
+  if (RTO < 1s) {
+    RTO = RTO * 3;
+  } else if (RTO > 3s) {
+    RTO = RTO * 1.5;
+  } else {
+    RTO = RTO * 2;
+  }
 }
 ~~~~
 
