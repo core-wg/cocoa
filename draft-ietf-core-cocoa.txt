@@ -5,11 +5,11 @@
 CoRE Working Group                                            C. Bormann
 Internet-Draft                                   Universitaet Bremen TZI
 Intended status: Informational                                A. Betzler
-Expires: May 2, 2018                                      Fundacio i2CAT
+Expires: June 24, 2018                                    Fundacio i2CAT
                                                                 C. Gomez
                                                              I. Demirkol
                      Universitat Politecnica de Catalunya/Fundacio i2CAT
-                                                        October 29, 2017
+                                                       December 21, 2017
 
 
                 CoAP Simple Congestion Control/Advanced
@@ -49,13 +49,13 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on May 2, 2018.
+   This Internet-Draft will expire on June 24, 2018.
 
 
 
-Bormann, et al.            Expires May 2, 2018                  [Page 1]
+Bormann, et al.           Expires June 24, 2018                 [Page 1]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
 Copyright Notice
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Bormann, et al.            Expires May 2, 2018                  [Page 2]
+Bormann, et al.           Expires June 24, 2018                 [Page 2]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
    Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  17
@@ -156,8 +156,8 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in BCP
-   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
 
@@ -165,9 +165,9 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
 
 
 
-Bormann, et al.            Expires May 2, 2018                  [Page 3]
+Bormann, et al.           Expires June 24, 2018                 [Page 3]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
    (Note that the present document is itself informational, but it is
@@ -221,9 +221,9 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
 
 
 
-Bormann, et al.            Expires May 2, 2018                  [Page 4]
+Bormann, et al.           Expires June 24, 2018                 [Page 4]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
    The scope of each instance of the algorithm in the current set of
@@ -277,9 +277,9 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
 
 
 
-Bormann, et al.            Expires May 2, 2018                  [Page 5]
+Bormann, et al.           Expires June 24, 2018                 [Page 5]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
 4.1.  Blind RTO Estimate
@@ -333,9 +333,9 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
 
 
 
-Bormann, et al.            Expires May 2, 2018                  [Page 6]
+Bormann, et al.           Expires June 24, 2018                 [Page 6]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
 4.2.1.  Differences with the algorithm of RFC 6298
@@ -389,9 +389,9 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
 
 
 
-Bormann, et al.            Expires May 2, 2018                  [Page 7]
+Bormann, et al.           Expires June 24, 2018                 [Page 7]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
    experiments appears to support that the overall effect of using this
@@ -421,7 +421,7 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    these RTO aging calculations cumulatively at the time the estimator
    is used next.)
 
-   Psuedocode and examples for the aging mechanism presented are
+   Pseudocode and examples for the aging mechanism presented are
    available in Appendix B.2 and in Appendix C.2.
 
 5.  Advanced CoAP Congestion Control: Non-Confirmables
@@ -445,9 +445,9 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
 
 
 
-Bormann, et al.            Expires May 2, 2018                  [Page 8]
+Bormann, et al.           Expires June 24, 2018                 [Page 8]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
    2.  An RTO as specified in Section 4 must be used for confirmable
@@ -464,14 +464,14 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
    TFRC-style Loss Event Rate calculator [RFC5348] and apply the TCP
    equation to achieve a higher rate than 1/RTO.
 
-   [RFC7641], Section 4.5.1, specifies that the rate of NONs SHOULD NOT
-   exceed 1/RTT on average, if the server can maintain an RTT estimate
-   for a client.  CoCoA limits the packet rate of NONs in this situation
-   to 1/RTO.  Assuming that the RTO estimation in CoCoA works as
-   expected, RTO[k] should be slightly greater than the RTT[k], thus
-   CoCoA would be more conservative.  The expectation therefore is that
-   complying with the NON rate set by CoCoA leads to complying with
-   [RFC7641].
+   [RFC7641], Section 4.5.1, specifies that the rate of Non-Confirmables
+   SHOULD NOT exceed 1/RTT on average, if the server can maintain an RTT
+   estimate for a client.  CoCoA limits the packet rate of Non-
+   Confirmables in this situation to 1/RTO.  Assuming that the RTO
+   estimation in CoCoA works as expected, RTO[k] should be slightly
+   greater than the RTT[k], thus CoCoA would be more conservative.  The
+   expectation therefore is that complying with the NON rate set by
+   CoCoA leads to complying with [RFC7641].
 
 6.  IANA Considerations
 
@@ -501,9 +501,9 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
 
 
 
-Bormann, et al.            Expires May 2, 2018                  [Page 9]
+Bormann, et al.           Expires June 24, 2018                 [Page 9]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
 8.  References
@@ -557,9 +557,9 @@ Internet-Draft              CoAP Simple CoCoA               October 2017
 
 
 
-Bormann, et al.            Expires May 2, 2018                 [Page 10]
+Bormann, et al.           Expires June 24, 2018                [Page 10]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
    [I-D.bormann-core-congestion-control]
@@ -607,21 +607,21 @@ Appendix A.  Supporting evidence
    samples.
 
    It has been shown over real GPRS and IEEE 802.15.4 mesh network
-   testebds that in these settings, in comparison to default CoAP, CoCoA
+   testbeds that in these settings, in comparison to default CoAP, CoCoA
    increases throughput and reduces the time it takes for a network to
    process traffic bursts, while not sacrificing fairness.  In contrast,
 
 
 
-Bormann, et al.            Expires May 2, 2018                 [Page 11]
+Bormann, et al.           Expires June 24, 2018                [Page 11]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
    other RTT-sensitive approaches such as Linux-RTO or Peak-Hopper-RTO
    may be too simple or do not adapt well to IoT scenarios,
    underperforming default CoAP under certain conditions [1].  On the
-   other hand, CoCoA has been found to reduce latency in GPRS and Wi-Fi
+   other hand, CoCoA has been found to reduce latency in GPRS and WiFi
    setups, compared with default CoAP [2].
 
    CoCoA performance has also been evaluated for non-confirmable traffic
@@ -669,9 +669,9 @@ A.2.  References
 
 
 
-Bormann, et al.            Expires May 2, 2018                 [Page 12]
+Bormann, et al.           Expires June 24, 2018                [Page 12]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
    Service-Oriented Cyber-Physical Systems in Converging Networked
@@ -712,22 +712,22 @@ B.1.  Updating the RTO estimator
                      + BETA * (RTT_strong - RTT);
        RTT_strong  = (1 - ALPHA) * RTT_strong + ALPHA * RTT;
        E_strong = RTT_strong  + 4 * RTTVAR_strong;
-       RTO_new = W_STRONG * E_strong + (1 - W_STRONG) * RTO_previous;
+       RTO = W_STRONG * E_strong + (1 - W_STRONG) * RTO;
      } else if (retransmissions <= 2) {
        RTTVAR_weak = (1 - BETA) * RTTVAR_weak
                    + BETA * (RTT_weak - RTT);
        RTT_weak  = (1 - ALPHA) * RTT_weak + ALPHA * RTT;
        E_weak = RTT_weak  + 1 * RTTVAR_weak;
-       RTO_new = W_WEAK * E_weak + (1 - W_WEAK) * RTO_previous
+       RTO = W_WEAK * E_weak + (1 - W_WEAK) * RTO
      }
    }
 
 
 
 
-Bormann, et al.            Expires May 2, 2018                 [Page 13]
+Bormann, et al.           Expires June 24, 2018                [Page 13]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
 B.2.  RTO aging
@@ -781,9 +781,9 @@ C.1.  Example A.1: weak RTTs
 
 
 
-Bormann, et al.            Expires May 2, 2018                 [Page 14]
+Bormann, et al.           Expires June 24, 2018                [Page 14]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
    before obtaining an ACK (given the RTT of 2 s and that the ACK is not
@@ -837,9 +837,9 @@ C.3.  Example B: VBF and aging
 
 
 
-Bormann, et al.            Expires May 2, 2018                 [Page 15]
+Bormann, et al.           Expires June 24, 2018                [Page 15]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
 Appendix D.  Analysis: difference between strong and weak estimators
@@ -893,9 +893,9 @@ Acknowledgements
 
 
 
-Bormann, et al.            Expires May 2, 2018                 [Page 16]
+Bormann, et al.           Expires June 24, 2018                [Page 16]
 
-Internet-Draft              CoAP Simple CoCoA               October 2017
+Internet-Draft              CoAP Simple CoCoA              December 2017
 
 
    Computer Laboratory of the University of Cambridge, in collaboration
@@ -949,4 +949,4 @@ Authors' Addresses
 
 
 
-Bormann, et al.            Expires May 2, 2018                 [Page 17]
+Bormann, et al.           Expires June 24, 2018                [Page 17]
