@@ -113,7 +113,7 @@ informative:
 
 --- abstract
 
-The CoAP protocol needs to be implemented in such a way that it does
+CoAP, the Constrained Application Protocol, needs to be implemented in such a way that it does
 not cause persistent congestion on the network it uses.  The CoRE CoAP
 specification defines basic behavior that exhibits low risk of
 congestion with minimal implementation requirements.  It also leaves
@@ -136,7 +136,7 @@ real networks.
 Introduction
 ============
 
-The CoAP protocol needs to be implemented in such a way that it does
+CoAP, the Constrained Application Protocol, needs to be implemented in such a way that it does
 not cause persistent congestion on the network it uses.  The CoRE CoAP
 specification defines basic behavior that exhibits low risk of
 congestion with minimal implementation requirements.  It also leaves
@@ -148,6 +148,15 @@ Control mechanism, with the goal of improving performance while
 retaining safety as well as the simplicity that is appropriate for
 constrained devices.  Hence, we are calling this mechanism Simple
 CoCoA (Congestion Control/Advanced).
+
+[FIXME] CoCoA calculates the retransmission time-out (RTO) based on
+RTT estimations with and without loss.  It limits the sending rate
+(for non-confirmable packets) to 1/RTO; assuming that the RTO
+estimation in CoCoA works as expected, RTO should be slightly greater
+than the RTT, thus CoCoA would be more conservative than the original
+specification in {{-observe}}.  By taking retransmissions (in a
+potentially lossy network) into account when estimating the RTT, this
+algorithm reacts to congestion with a lower sending rate.
 
 In the Internet, congestion control is typically implemented in a way
 that it can be introduced or upgraded unilaterally.  Still, a new
@@ -177,9 +186,9 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all
 capitals, as shown here.
 
-(Note that the present document is itself informational, but it is
-discussing normative statements about behavior that makes the
-congestion control scheme work in a safe manner.)
+<!-- (Note that the present document is itself informational, but it is -->
+<!-- discussing normative statements about behavior that makes the -->
+<!-- congestion control scheme work in a safe manner.) -->
 
 The term "byte", abbreviated by "B", is used in its now customary
 sense as a synonym for "octet".
@@ -288,7 +297,7 @@ additional exchange is 6 seconds.
 ## Measured RTO Estimate
 
 The RTO estimator runs two copies of the algorithm defined in
-{{RFC6298}}, with the differences introduced in {{mod}}:
+{{RFC6298}}, using the same variables and calculations to estimate the RTO, with the differences introduced in {{mod}}:
 One copy for exchanges that complete on initial transmissions (the
 "strong estimator", E_strong_), and one copy for exchanges that have run into
 retransmissions, where only the first two retransmissions are
@@ -305,9 +314,9 @@ evolved after each contribution to the weak estimator (1) or to the strong
 estimator (2), from the estimator (either the weak or strong estimator) that made the
 most recent contribution:
 
-> RTO := w_weak * E_weak_ + (1 - w_weak) * RTO           (1)
+    RTO := w_weak   * E_weak_   + (1 - w_weak)   * RTO       (1)
 
-> RTO := w_strong * E_strong_ + (1 - w_strong) * RTO     (2)
+    RTO := w_strong * E_strong_ + (1 - w_strong) * RTO       (2)
 
 (Splitting this update into the two cases avoids making the
 contribution of the weak estimator too big in naturally lossy
@@ -322,6 +331,11 @@ presented are available in {{pseudo-rto}} and {{examples-rto}}.
 This subsection presents three differences of the algorithm defined in this
 document with the one defined in {{RFC6298}}.  The first two
 recommend new parameter settings.  The third one is the variable
+backoff factor (VBF), which replaces RFC6298's simple exponential
+backoff that always multiplies the RTO by a factor of 2 when the RTO
+timer expires.
+
+The third one is the variable
 backoff factor mechanism.
 
 The initial value for each of the two RTO estimators is 2 s.
@@ -376,7 +390,7 @@ reference is {{Betzler2015}}.
 The state of the RTO estimators for an endpoint SHOULD be kept as long
 as possible.  If other state is kept for the endpoint (such as a DTLS
 connection), it is very strongly RECOMMENDED to keep the RTO state
-alive at least as long as this other state.  It MUST be kept for at
+alive at least as long as this other state.  [FICME] It MUST be kept for at
 least 255 s.
 
 If an estimator has a value that is lower than 1 s, and it is left
