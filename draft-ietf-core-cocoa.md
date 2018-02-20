@@ -230,9 +230,15 @@ stress to the network and the same level of safety from catastrophic congestion.
 The algorithm defined in this document is intended to adapt to the current characteristics
 of any underlying network, and therefore is well suited for a wide range of network
 conditions, in terms of bandwidth, latency, load, loss rate, topology, etc.
-It does require three state variables per scope plus the state needed
+In particular, CoCoA has been found to perform well in
+  scenarios with latencies ranging from the order of milliseconds to
+  dozens of seconds, as well as in single-hop and multihop topologies. Link
+  technologies used in existing evaluation work comprise IEEE 802.15.4,
+  GPRS, UMTS and Wi-Fi (see {{evidence}}). CoCoA is also expected to work
+  suitably across the general Internet.  The algorithm
+does require three state variables per scope plus the state needed
 to do RTT measurements, so it may not be applicable to the most
-constrained devices (class 1 as per {{?RFC7228}}).
+constrained devices (say, class 1 as per {{?RFC7228}}).
 
 The scope of each instance of the algorithm in the current set of
 evaluations has been the five-tuple, i.e., CoAP + endpoint (transport
@@ -244,7 +250,7 @@ Advanced CoAP Congestion Control: RTO Estimation {#rto}
 
 For an initiator that plans to make multiple requests to one
 destination endpoint, it may be worthwhile to make RTT measurements in
-order to obtain a better RTO estimation than that implied by the
+order to compute a more appropriate RTO than the
 default initial timeout of 2 to 3 s.  In particular, a wide spectrum
 of RTT values is expected in different types of networks where CoAP is used.
 Those RTTs range from several orders of magnitude below the default initial
@@ -294,7 +300,7 @@ the number of parallel exchanges, e.g. if two
 exchanges are already running, the initial RTO estimate for an
 additional exchange is 6 seconds.
 
-## Measured RTO Estimate
+## Measurement-based RTO Estimate
 
 The RTO estimator runs two copies of the algorithm defined in
 {{RFC6298}}, using the same variables and calculations to estimate the RTO, with the differences introduced in {{mod}}:
