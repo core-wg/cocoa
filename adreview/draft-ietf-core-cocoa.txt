@@ -132,16 +132,16 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    Control mechanism, with the goal of improving performance while
    retaining safety as well as the simplicity that is appropriate for
    constrained devices.  Hence, we are calling this mechanism Simple
-   CoCoA (Congestion Control/Advanced).
+   Congestion Control/Advanced, or CoCoA for short.
 
-   [FIXME] CoCoA calculates the retransmission time-out (RTO) based on
-   RTT estimations with and without loss.  It limits the sending rate
-   (for non-confirmable packets) to 1/RTO; assuming that the RTO
-   estimation in CoCoA works as expected, RTO should be slightly greater
-   than the RTT, thus CoCoA would be more conservative than the original
-   specification in [RFC7641].  By taking retransmissions (in a
+   CoCoA calculates the retransmission time-out (RTO) based on RTT
+   estimations with and without loss.  By taking retransmissions (in a
    potentially lossy network) into account when estimating the RTT, this
-   algorithm reacts to congestion with a lower sending rate.
+   algorithm reacts to congestion with a lower sending rate.  For non-
+   confirmable packets it also limits the sending rate to 1/RTO;
+   assuming that the RTO estimation in CoCoA works as expected, RTO
+   should be slightly greater than the RTT, thus CoCoA would be more
+   conservative than the original specification in [RFC7641].
 
    In the Internet, congestion control is typically implemented in a way
    that it can be introduced or upgraded unilaterally.  Still, a new
