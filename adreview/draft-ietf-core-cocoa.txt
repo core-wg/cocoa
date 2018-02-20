@@ -83,17 +83,17 @@ Table of Contents
    3.  Area of Applicability . . . . . . . . . . . . . . . . . . . .   4
    4.  Advanced CoAP Congestion Control: RTO Estimation  . . . . . .   5
      4.1.  Blind RTO Estimate  . . . . . . . . . . . . . . . . . . .   6
-     4.2.  Measured RTO Estimate . . . . . . . . . . . . . . . . . .   6
+     4.2.  Measurement-based RTO Estimate  . . . . . . . . . . . . .   6
        4.2.1.  Differences with the algorithm of RFC 6298  . . . . .   7
        4.2.2.  Discussion  . . . . . . . . . . . . . . . . . . . . .   7
      4.3.  Lifetime, Aging . . . . . . . . . . . . . . . . . . . . .   8
-   5.  Advanced CoAP Congestion Control: Non-Confirmables  . . . . .   8
+   5.  Advanced CoAP Congestion Control: Non-Confirmables  . . . . .   9
      5.1.  Discussion  . . . . . . . . . . . . . . . . . . . . . . .   9
    6.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .   9
-   7.  Security Considerations . . . . . . . . . . . . . . . . . . .   9
+   7.  Security Considerations . . . . . . . . . . . . . . . . . . .  10
    8.  References  . . . . . . . . . . . . . . . . . . . . . . . . .  10
      8.1.  Normative References  . . . . . . . . . . . . . . . . . .  10
-     8.2.  Informative References  . . . . . . . . . . . . . . . . .  10
+     8.2.  Informative References  . . . . . . . . . . . . . . . . .  11
    Appendix A.  Supporting evidence  . . . . . . . . . . . . . . . .  11
      A.1.  Older versions of the draft and improvement . . . . . . .  12
      A.2.  References  . . . . . . . . . . . . . . . . . . . . . . .  12
@@ -229,9 +229,15 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    intended to adapt to the current characteristics of any underlying
    network, and therefore is well suited for a wide range of network
    conditions, in terms of bandwidth, latency, load, loss rate,
-   topology, etc.  It does require three state variables per scope plus
-   the state needed to do RTT measurements, so it may not be applicable
-   to the most constrained devices (class 1 as per [RFC7228]).
+   topology, etc.  In particular, CoCoA has been found to perform well
+   in scenarios with latencies ranging from the order of milliseconds to
+   dozens of seconds, as well as in single-hop and multihop topologies.
+   Link technologies used in existing evaluation work comprise IEEE
+   802.15.4, GPRS, UMTS and Wi-Fi (see Appendix A).  CoCoA is also
+   expected to work suitably across the general Internet.  The algorithm
+   does require three state variables per scope plus the state needed to
+   do RTT measurements, so it may not be applicable to the most
+   constrained devices (say, class 1 as per [RFC7228]).
 
    The scope of each instance of the algorithm in the current set of
    evaluations has been the five-tuple, i.e., CoAP + endpoint (transport
@@ -242,18 +248,17 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
    For an initiator that plans to make multiple requests to one
    destination endpoint, it may be worthwhile to make RTT measurements
-   in order to obtain a better RTO estimation than that implied by the
-   default initial timeout of 2 to 3 s.  In particular, a wide spectrum
-   of RTT values is expected in different types of networks where CoAP
-   is used.  Those RTTs range from several orders of magnitude below the
-   default initial timeout to values larger than the default.  The
-   algorithm defined in this document is based on the algorithm for RTO
-   estimation defined in [RFC6298], with appropriately extended default/
-   base values, as proposed in Section 4.2.1.  Note that such a
-   mechanism must, during idle periods, decay RTO estimates that are
-   shorter or longer than the default RTO estimate back to the default
-   RTO estimate, until fresh measurements become available again, as
-   proposed in Section 4.3.
+   in order to compute a more appropriate RTO than the default initial
+   timeout of 2 to 3 s.  In particular, a wide spectrum of RTT values is
+   expected in different types of networks where CoAP is used.  Those
+   RTTs range from several orders of magnitude below the default initial
+   timeout to values larger than the default.  The algorithm defined in
+   this document is based on the algorithm for RTO estimation defined in
+   [RFC6298], with appropriately extended default/base values, as
+   proposed in Section 4.2.1.  Note that such a mechanism must, during
+   idle periods, decay RTO estimates that are shorter or longer than the
+   default RTO estimate back to the default RTO estimate, until fresh
+   measurements become available again, as proposed in Section 4.3.
 
    RTT variability challenges RTO estimation.  In TCP, delayed ACKs
    contribute to RTT variability, since this option adds a delay of up
@@ -269,11 +274,6 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    e.g. after 1 s.  A client that has arrived at a RTO estimate shorter
    than 1 s SHOULD therefore use a larger backoff factor for
    retransmissions to avoid expending all of its retransmissions
-   (MAX_RETRANSMIT, see Section 4.2 of [RFC7252], normally 4) in the
-   default interval of 2 to 3 s.  The approach chosen for a mechanism
-   with variable backoff factors is presented in Section 4.2.1.
-
-
 
 
 
@@ -281,6 +281,10 @@ Bormann, et al.          Expires August 24, 2018                [Page 5]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
+
+   (MAX_RETRANSMIT, see Section 4.2 of [RFC7252], normally 4) in the
+   default interval of 2 to 3 s.  The approach chosen for a mechanism
+   with variable backoff factors is presented in Section 4.2.1.
 
    It may also be worthwhile to perform RTT estimation not just based on
    information measured from a single destination endpoint, but also
@@ -301,7 +305,7 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    already running, the initial RTO estimate for an additional exchange
    is 6 seconds.
 
-4.2.  Measured RTO Estimate
+4.2.  Measurement-based RTO Estimate
 
    The RTO estimator runs two copies of the algorithm defined in
    [RFC6298], using the same variables and calculations to estimate the
@@ -326,10 +330,6 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
    RTO := w_strong * E_strong_ + (1 - w_strong) * RTO       (2)
 
-   (Splitting this update into the two cases avoids making the
-   contribution of the weak estimator too big in naturally lossy
-   networks.)
-
 
 
 
@@ -337,6 +337,10 @@ Bormann, et al.          Expires August 24, 2018                [Page 6]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
+
+   (Splitting this update into the two cases avoids making the
+   contribution of the weak estimator too big in naturally lossy
+   networks.)
 
    The default values for the corresponding weights, w_weak and
    w_strong, are 0.25 and 0.5, respectively.  Pseudocode and examples
@@ -382,10 +386,6 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    ambiguous information from retransmissions.  This is motivated by the
    high non-congestion loss rates expected in constrained node networks,
    and the need to update the RTO estimators even in the presence of
-   loss.  This approach appears to contravene the mandate in
-   Section 3.1.1 of [RFC8085] that "latency samples MUST NOT be derived
-   from ambiguous transactions".  However, those samples are not simply
-   combined into the strong estimator, but are used to correct the
 
 
 
@@ -394,6 +394,10 @@ Bormann, et al.          Expires August 24, 2018                [Page 7]
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
+   loss.  This approach appears to contravene the mandate in
+   Section 3.1.1 of [RFC8085] that "latency samples MUST NOT be derived
+   from ambiguous transactions".  However, those samples are not simply
+   combined into the strong estimator, but are used to correct the
    limited knowledge that can be gained from the strong RTT measurements
    by employing an additional weak estimator.  In fact, the weak
    estimator allows to better update the RTO estimator when mostly weak
@@ -434,12 +438,8 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    Pseudocode and examples for the aging mechanism presented are
    available in Appendix B.2 and in Appendix C.2.
 
-5.  Advanced CoAP Congestion Control: Non-Confirmables
 
-   A CoAP endpoint MUST NOT send non-confirmables to another CoAP
-   endpoint at a rate higher than defined by this document.  Independent
-   of any congestion control mechanisms, a CoAP endpoint can always send
-   non-confirmables if their rate does not exceed 1 B/s.
+
 
 
 
@@ -449,6 +449,13 @@ Bormann, et al.          Expires August 24, 2018                [Page 8]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
+
+5.  Advanced CoAP Congestion Control: Non-Confirmables
+
+   A CoAP endpoint MUST NOT send non-confirmables to another CoAP
+   endpoint at a rate higher than defined by this document.  Independent
+   of any congestion control mechanisms, a CoAP endpoint can always send
+   non-confirmables if their rate does not exceed 1 B/s.
 
    Non-confirmables that form part of exchanges are governed by the
    rules for exchanges.
@@ -488,6 +495,17 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    This document makes no requirements on IANA.  (This section to be
    removed by RFC editor.)
 
+
+
+
+
+
+
+Bormann, et al.          Expires August 24, 2018                [Page 9]
+
+Internet-Draft              CoAP Simple CoCoA              February 2018
+
+
 7.  Security Considerations
 
    The security considerations of, e.g., [RFC5681], [RFC2914], and
@@ -498,14 +516,6 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    a consequence will be an RTO increase, which will further reduce
    network performance.  Note that this type of attack is not specific
    for CoCoA (and not even specific for CoAP), and many congestion
-
-
-
-Bormann, et al.          Expires August 24, 2018                [Page 9]
-
-Internet-Draft              CoAP Simple CoCoA              February 2018
-
-
    control algorithms increase the RTO upon packet loss detection.
    While it is hard to prevent radio jamming, some mitigation for other
    forms of this type of attack is provided by network access control
@@ -545,6 +555,13 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/info/rfc8174>.
 
+
+
+Bormann, et al.          Expires August 24, 2018               [Page 10]
+
+Internet-Draft              CoAP Simple CoCoA              February 2018
+
+
 8.2.  Informative References
 
    [Betzler2013]
@@ -552,15 +569,6 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
               "Congestion control in reliable CoAP communication",
               ACM MSWIM'13 p. 365-372, DOI 10.1145/2507924.2507954,
               2013.
-
-
-
-
-
-Bormann, et al.          Expires August 24, 2018               [Page 10]
-
-Internet-Draft              CoAP Simple CoCoA              February 2018
-
 
    [Betzler2015]
               Betzler, A., Gomez, C., Demirkol, I., and J. Paradells,
@@ -603,14 +611,6 @@ Appendix A.  Supporting evidence
    merged with those from the specification proper, depending on the
    discretion of the RFC editor.)
 
-   CoCoA has been evaluated by means of simulation and experimentation
-   in diverse scenarios comprising different link layer technologies,
-   network topologies, traffic patterns and device classes.  The main
-   overall evaluation result is that CoCoA consistently delivers a
-   performance which is better than, or at least similar to, that of
-   default CoAP congestion control.  While the latter is insensitive to
-
-
 
 
 Bormann, et al.          Expires August 24, 2018               [Page 11]
@@ -618,6 +618,12 @@ Bormann, et al.          Expires August 24, 2018               [Page 11]
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
+   CoCoA has been evaluated by means of simulation and experimentation
+   in diverse scenarios comprising different link layer technologies,
+   network topologies, traffic patterns and device classes.  The main
+   overall evaluation result is that CoCoA consistently delivers a
+   performance which is better than, or at least similar to, that of
+   default CoAP congestion control.  While the latter is insensitive to
    network conditions, CoCoA is adaptive and makes good use of RTT
    samples.
 
@@ -661,18 +667,17 @@ A.2.  References
    Congestion Control Mechanisms for Unreliable CoAP Communications",
    PE-WASUN, Cancun, Mexico, 2015.
 
-   [4] A.  Betzler, J.  Isern, C.  Gomez, I.  Demirkol, J.  Paradells,
-   "Experimental Evaluation of Congestion Control for CoAP
-   Communications without End-to-End Reliability", Ad Hoc Networks,
-   Volume 52, 1 December 2016, Pages 183-194.
-
-
 
 
 Bormann, et al.          Expires August 24, 2018               [Page 12]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
+
+   [4] A.  Betzler, J.  Isern, C.  Gomez, I.  Demirkol, J.  Paradells,
+   "Experimental Evaluation of Congestion Control for CoAP
+   Communications without End-to-End Reliability", Ad Hoc Networks,
+   Volume 52, 1 December 2016, Pages 183-194.
 
    [5] A.  Betzler, C.  Gomez, I.  Demirkol, J.  Paradells, "Congestion
    Control in Reliable CoAP Communication", 16th ACM International
@@ -706,11 +711,6 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 Appendix B.  Pseudocode
 
 B.1.  Updating the RTO estimator
-
-
-
-
-
 
 
 
