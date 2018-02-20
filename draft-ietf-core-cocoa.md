@@ -335,9 +335,6 @@ backoff factor (VBF), which replaces RFC6298's simple exponential
 backoff that always multiplies the RTO by a factor of 2 when the RTO
 timer expires.
 
-The third one is the variable
-backoff factor mechanism.
-
 The initial value for each of the two RTO estimators is 2 s.
 
 For the weak estimator, the factor K (the RTT variance multiplier) is
@@ -390,8 +387,11 @@ reference is {{Betzler2015}}.
 The state of the RTO estimators for an endpoint SHOULD be kept as long
 as possible.  If other state is kept for the endpoint (such as a DTLS
 connection), it is very strongly RECOMMENDED to keep the RTO state
-alive at least as long as this other state.  [FICME] It MUST be kept for at
-least 255 s.
+alive at least as long as this other state.
+In the absence of such other state, the RTO state SHOULD be kept at least
+long enough to avoid frequent returns to inappropriate initial values.
+For the default parameter set of Section 4.8 of {{-coap}}, it is
+strongly RECOMMENDED to be keep it for at least 255 s.
 
 If an estimator has a value that is lower than 1 s, and it is left
 without further update for 16 times its current value, the RTO
