@@ -313,7 +313,7 @@ address {
 
   <meta name="dct.creator" content="Bormann, C., Betzler, A., Gomez, C., and I. Demirkol" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-core-cocoa-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2018-02-19" />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-20" />
   <meta name="dct.abstract" content="CoAP, the Constrained Application Protocol, needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance." />
   <meta name="description" content="CoAP, the Constrained Application Protocol, needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance." />
 
@@ -337,7 +337,7 @@ address {
 <td class="right">A. Betzler</td>
 </tr>
 <tr>
-<td class="left">Expires: August 23, 2018</td>
+<td class="left">Expires: August 24, 2018</td>
 <td class="right">Fundaci&#243; i2CAT</td>
 </tr>
 <tr>
@@ -354,7 +354,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">February 19, 2018</td>
+<td class="right">February 20, 2018</td>
 </tr>
 
     	
@@ -371,7 +371,7 @@ address {
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on August 23, 2018.</p>
+<p>This Internet-Draft will expire on August 24, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
 <p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
@@ -505,13 +505,12 @@ RTO := w_strong * E_strong_ + (1 - w_strong) * RTO       (2)
 <a href="#rfc.section.4.2.1">4.2.1.</a> <a href="#mod" id="mod">Differences with the algorithm of RFC 6298</a>
 </h1>
 <p id="rfc.section.4.2.1.p.1">This subsection presents three differences of the algorithm defined in this document with the one defined in <a href="#RFC6298" class="xref">[RFC6298]</a>.  The first two recommend new parameter settings.  The third one is the variable backoff factor (VBF), which replaces RFC6298&#8217;s simple exponential backoff that always multiplies the RTO by a factor of 2 when the RTO timer expires.</p>
-<p id="rfc.section.4.2.1.p.2">The third one is the variable backoff factor mechanism.</p>
-<p id="rfc.section.4.2.1.p.3">The initial value for each of the two RTO estimators is 2 s.</p>
-<p id="rfc.section.4.2.1.p.4">For the weak estimator, the factor K (the RTT variance multiplier) is set to 1 instead of 4.  This is necessary to avoid a strong increase of the RTO in the case that the RTTVAR value is very large, which may be the case if a weak RTT measurement is obtained after one or more retransmissions.</p>
-<p id="rfc.section.4.2.1.p.5">In order to avoid that exchanges with small initial RTOs (i.e. RTO estimate lower than 1 s) use up all retransmissions in a short interval of time, the RTO for a retransmission is multiplied by 3 for each retransmission as long as the RTO is less than 1&#160;s.</p>
-<p id="rfc.section.4.2.1.p.6">On the other hand, to avoid exchanges with large initial RTOs (i.e., RTO estimate greater than 3 s) not being able to carry out all retransmissions within MAX_TRANSMIT_WAIT (normally 93 s), the RTO is multiplied only by 1.5 when RTO is greater than 3&#160;s.</p>
-<p id="rfc.section.4.2.1.p.7">Pseudocode for the variable backoff factor is in <a href="#pseudo-vbf" class="xref">Appendix B.3</a>.</p>
-<p id="rfc.section.4.2.1.p.8">The binary exponential backoff is truncated at 32 seconds.  Similar to the way retransmissions are handled in the base specification, they are dithered between 1 x RTO and ACK_RANDOM_FACTOR x RTO.</p>
+<p id="rfc.section.4.2.1.p.2">The initial value for each of the two RTO estimators is 2 s.</p>
+<p id="rfc.section.4.2.1.p.3">For the weak estimator, the factor K (the RTT variance multiplier) is set to 1 instead of 4.  This is necessary to avoid a strong increase of the RTO in the case that the RTTVAR value is very large, which may be the case if a weak RTT measurement is obtained after one or more retransmissions.</p>
+<p id="rfc.section.4.2.1.p.4">In order to avoid that exchanges with small initial RTOs (i.e. RTO estimate lower than 1 s) use up all retransmissions in a short interval of time, the RTO for a retransmission is multiplied by 3 for each retransmission as long as the RTO is less than 1&#160;s.</p>
+<p id="rfc.section.4.2.1.p.5">On the other hand, to avoid exchanges with large initial RTOs (i.e., RTO estimate greater than 3 s) not being able to carry out all retransmissions within MAX_TRANSMIT_WAIT (normally 93 s), the RTO is multiplied only by 1.5 when RTO is greater than 3&#160;s.</p>
+<p id="rfc.section.4.2.1.p.6">Pseudocode for the variable backoff factor is in <a href="#pseudo-vbf" class="xref">Appendix B.3</a>.</p>
+<p id="rfc.section.4.2.1.p.7">The binary exponential backoff is truncated at 32 seconds.  Similar to the way retransmissions are handled in the base specification, they are dithered between 1 x RTO and ACK_RANDOM_FACTOR x RTO.</p>
 <h1 id="rfc.section.4.2.2">
 <a href="#rfc.section.4.2.2">4.2.2.</a> <a href="#discussion" id="discussion">Discussion</a>
 </h1>
@@ -520,7 +519,7 @@ RTO := w_strong * E_strong_ + (1 - w_strong) * RTO       (2)
 <h1 id="rfc.section.4.3">
 <a href="#rfc.section.4.3">4.3.</a> <a href="#aging" id="aging">Lifetime, Aging</a>
 </h1>
-<p id="rfc.section.4.3.p.1">The state of the RTO estimators for an endpoint SHOULD be kept as long as possible.  If other state is kept for the endpoint (such as a DTLS connection), it is very strongly RECOMMENDED to keep the RTO state alive at least as long as this other state.  [FICME] It MUST be kept for at least 255&#160;s.</p>
+<p id="rfc.section.4.3.p.1">The state of the RTO estimators for an endpoint SHOULD be kept as long as possible.  If other state is kept for the endpoint (such as a DTLS connection), it is very strongly RECOMMENDED to keep the RTO state alive at least as long as this other state.  In the absence of such other state, the RTO state SHOULD be kept at least long enough to avoid frequent returns to inappropriate initial values.  For the default parameter set of Section 4.8 of <a href="#RFC7252" class="xref">[RFC7252]</a>, it is strongly RECOMMENDED to be keep it for at least 255&#160;s.</p>
 <p id="rfc.section.4.3.p.2">If an estimator has a value that is lower than 1 s, and it is left without further update for 16 times its current value, the RTO estimate is doubled.  If an estimator has a value that is higher than 3 s, and it is left without further update for 4 times its current value, the RTO estimate is set to be</p>
 <p></p>
 

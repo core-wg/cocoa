@@ -5,11 +5,11 @@
 CoRE Working Group                                            C. Bormann
 Internet-Draft                                   Universitaet Bremen TZI
 Intended status: Informational                                A. Betzler
-Expires: August 23, 2018                                  Fundacio i2CAT
+Expires: August 24, 2018                                  Fundacio i2CAT
                                                                 C. Gomez
                                                              I. Demirkol
                      Universitat Politecnica de Catalunya/Fundacio i2CAT
-                                                       February 19, 2018
+                                                       February 20, 2018
 
 
                 CoAP Simple Congestion Control/Advanced
@@ -53,12 +53,12 @@ Status of This Memo
 
 
 
-Bormann, et al.          Expires August 23, 2018                [Page 1]
+Bormann, et al.          Expires August 24, 2018                [Page 1]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
-   This Internet-Draft will expire on August 23, 2018.
+   This Internet-Draft will expire on August 24, 2018.
 
 Copyright Notice
 
@@ -109,7 +109,7 @@ Table of Contents
 
 
 
-Bormann, et al.          Expires August 23, 2018                [Page 2]
+Bormann, et al.          Expires August 24, 2018                [Page 2]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -165,7 +165,7 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 23, 2018                [Page 3]
+Bormann, et al.          Expires August 24, 2018                [Page 3]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -221,7 +221,7 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 23, 2018                [Page 4]
+Bormann, et al.          Expires August 24, 2018                [Page 4]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -277,7 +277,7 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 23, 2018                [Page 5]
+Bormann, et al.          Expires August 24, 2018                [Page 5]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -333,7 +333,7 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 23, 2018                [Page 6]
+Bormann, et al.          Expires August 24, 2018                [Page 6]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -351,8 +351,6 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    backoff factor (VBF), which replaces RFC6298's simple exponential
    backoff that always multiplies the RTO by a factor of 2 when the RTO
    timer expires.
-
-   The third one is the variable backoff factor mechanism.
 
    The initial value for each of the two RTO estimators is 2 s.
 
@@ -386,16 +384,16 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    and the need to update the RTO estimators even in the presence of
    loss.  This approach appears to contravene the mandate in
    Section 3.1.1 of [RFC8085] that "latency samples MUST NOT be derived
+   from ambiguous transactions".  However, those samples are not simply
+   combined into the strong estimator, but are used to correct the
 
 
 
-Bormann, et al.          Expires August 23, 2018                [Page 7]
+Bormann, et al.          Expires August 24, 2018                [Page 7]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
-   from ambiguous transactions".  However, those samples are not simply
-   combined into the strong estimator, but are used to correct the
    limited knowledge that can be gained from the strong RTT measurements
    by employing an additional weak estimator.  In fact, the weak
    estimator allows to better update the RTO estimator when mostly weak
@@ -415,8 +413,11 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    The state of the RTO estimators for an endpoint SHOULD be kept as
    long as possible.  If other state is kept for the endpoint (such as a
    DTLS connection), it is very strongly RECOMMENDED to keep the RTO
-   state alive at least as long as this other state.  [FICME] It MUST be
-   kept for at least 255 s.
+   state alive at least as long as this other state.  In the absence of
+   such other state, the RTO state SHOULD be kept at least long enough
+   to avoid frequent returns to inappropriate initial values.  For the
+   default parameter set of Section 4.8 of [RFC7252], it is strongly
+   RECOMMENDED to be keep it for at least 255 s.
 
    If an estimator has a value that is lower than 1 s, and it is left
    without further update for 16 times its current value, the RTO
@@ -440,15 +441,17 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    of any congestion control mechanisms, a CoAP endpoint can always send
    non-confirmables if their rate does not exceed 1 B/s.
 
-   Non-confirmables that form part of exchanges are governed by the
-   rules for exchanges.
 
 
 
-Bormann, et al.          Expires August 23, 2018                [Page 8]
+
+Bormann, et al.          Expires August 24, 2018                [Page 8]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
+
+   Non-confirmables that form part of exchanges are governed by the
+   rules for exchanges.
 
    Non-confirmables outside exchanges (e.g., [RFC7641] notifications
    sent as non-confirmables) are governed by the following rules:
@@ -495,17 +498,17 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    a consequence will be an RTO increase, which will further reduce
    network performance.  Note that this type of attack is not specific
    for CoCoA (and not even specific for CoAP), and many congestion
-   control algorithms increase the RTO upon packet loss detection.
-   While it is hard to prevent radio jamming, some mitigation for other
-   forms of this type of attack is provided by network access control
 
 
 
-Bormann, et al.          Expires August 23, 2018                [Page 9]
+Bormann, et al.          Expires August 24, 2018                [Page 9]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
+   control algorithms increase the RTO upon packet loss detection.
+   While it is hard to prevent radio jamming, some mitigation for other
+   forms of this type of attack is provided by network access control
    techniques.  Also, the weak estimator in CoCoA increases the chances
    of obtaining RTT measurements in the presence of heavy packet losses,
    allowing to keep the RTO updated, which in turn allows recovery from
@@ -554,10 +557,7 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-
-
-
-Bormann, et al.          Expires August 23, 2018               [Page 10]
+Bormann, et al.          Expires August 24, 2018               [Page 10]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -613,7 +613,7 @@ Appendix A.  Supporting evidence
 
 
 
-Bormann, et al.          Expires August 23, 2018               [Page 11]
+Bormann, et al.          Expires August 24, 2018               [Page 11]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -669,7 +669,7 @@ A.2.  References
 
 
 
-Bormann, et al.          Expires August 23, 2018               [Page 12]
+Bormann, et al.          Expires August 24, 2018               [Page 12]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -725,7 +725,7 @@ B.1.  Updating the RTO estimator
 
 
 
-Bormann, et al.          Expires August 23, 2018               [Page 13]
+Bormann, et al.          Expires August 24, 2018               [Page 13]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -781,7 +781,7 @@ B.3.  Variable Backoff Factor
 
 
 
-Bormann, et al.          Expires August 23, 2018               [Page 14]
+Bormann, et al.          Expires August 24, 2018               [Page 14]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -837,7 +837,7 @@ C.2.  Example A.2: VBF and aging
 
 
 
-Bormann, et al.          Expires August 23, 2018               [Page 15]
+Bormann, et al.          Expires August 24, 2018               [Page 15]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -893,7 +893,7 @@ Appendix D.  Analysis: difference between strong and weak estimators
 
 
 
-Bormann, et al.          Expires August 23, 2018               [Page 16]
+Bormann, et al.          Expires August 24, 2018               [Page 16]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -949,7 +949,7 @@ Authors' Addresses
 
 
 
-Bormann, et al.          Expires August 23, 2018               [Page 17]
+Bormann, et al.          Expires August 24, 2018               [Page 17]
 
 Internet-Draft              CoAP Simple CoCoA              February 2018
 
@@ -1005,4 +1005,4 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 23, 2018               [Page 18]
+Bormann, et al.          Expires August 24, 2018               [Page 18]
