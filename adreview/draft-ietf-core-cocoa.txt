@@ -138,7 +138,7 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    estimations with and without loss.  By taking retransmissions (in a
    potentially lossy network) into account when estimating the RTT, this
    algorithm reacts to congestion with a lower sending rate.  For non-
-   confirmable packets it also limits the sending rate to 1/RTO;
+   confirmable packets, it also limits the sending rate to 1/RTO;
    assuming that the RTO estimation in CoCoA works as expected, RTO
    should be slightly greater than the RTT, thus CoCoA would be more
    conservative than the original specification in [RFC7641].
@@ -177,8 +177,8 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in
-   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   "OPTIONAL" in this document are to be interpreted as described in BCP
+   14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
    The term "byte", abbreviated by "B", is used in its now customary
@@ -231,13 +231,13 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    conditions, in terms of bandwidth, latency, load, loss rate,
    topology, etc.  In particular, CoCoA has been found to perform well
    in scenarios with latencies ranging from the order of milliseconds to
-   dozens of seconds, as well as in single-hop and multihop topologies.
-   Link technologies used in existing evaluation work comprise IEEE
-   802.15.4, GPRS, UMTS and Wi-Fi (see Appendix A).  CoCoA is also
-   expected to work suitably across the general Internet.  The algorithm
-   does require three state variables per scope plus the state needed to
-   do RTT measurements, so it may not be applicable to the most
-   constrained devices (say, class 1 as per [RFC7228]).
+   peaks of dozens of seconds, as well as in single-hop and multihop
+   topologies.  Link technologies used in existing evaluation work
+   comprise IEEE 802.15.4, GPRS, UMTS and Wi-Fi (see Appendix A).  CoCoA
+   is also expected to work suitably across the general Internet.  The
+   algorithm does require three state variables per scope plus the state
+   needed to do RTT measurements, so it may not be applicable to the
+   most constrained devices (say, class 1 as per [RFC7228]).
 
    The scope of each instance of the algorithm in the current set of
    evaluations has been the five-tuple, i.e., CoAP + endpoint (transport
@@ -423,7 +423,7 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
    such other state, the RTO state SHOULD be kept at least long enough
    to avoid frequent returns to inappropriate initial values.  For the
    default parameter set of Section 4.8 of [RFC7252], it is strongly
-   RECOMMENDED to be keep it for at least 255 s.
+   RECOMMENDED to keep it for at least 255 s.
 
    If an estimator has a value that is lower than 1 s, and it is left
    without further update for 16 times its current value, the RTO
