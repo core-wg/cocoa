@@ -329,7 +329,9 @@ contribution of the weak estimator too big in naturally lossy
 networks.)
 
 The default values for the corresponding weights, w_weak and w_strong, are
-0.25 and 0.5, respectively. Pseudocode and examples for the overall RTO estimate
+0.25 and 0.5, respectively. These values have been found
+ to offer good performance in evaluations (see {{evidence}}).
+Pseudocode and examples for the overall RTO estimate
 presented are available in {{pseudo-rto}} and {{examples-rto}}.
 
 ### Differences with the algorithm of RFC 6298 {#mod}
@@ -379,7 +381,8 @@ limited knowledge that can be gained from the strong RTT measurements
 by employing an additional weak estimator.  In fact, the weak estimator
 allows to better update the RTO estimator when mostly weak RTTs are
 available, either due to the lossy nature of links or due to congestion-induced
-losses. In presence of the latter, spurious timeouts are avoided and the rate
+losses. In the presence of the latter, and compared to a strong-only estimator (w_weak=0),
+spurious timeouts are avoided and the rate
 of retries is reduced, which allows to decrease congestion. Evidence that has
 been collected from experiments appears to support that the overall effect
 of using this data in the way described is beneficial ({{evidence}}).
