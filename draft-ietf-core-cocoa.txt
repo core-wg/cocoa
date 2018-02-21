@@ -17,13 +17,13 @@ Expires: August 25, 2018                                  Fundacio i2CAT
 
 Abstract
 
-   CoAP, the Constrained Application Protocol, needs to be implemented
-   in such a way that it does not cause persistent congestion on the
-   network it uses.  The CoRE CoAP specification defines basic behavior
-   that exhibits low risk of congestion with minimal implementation
-   requirements.  It also leaves room for combining the base
-   specification with advanced congestion control mechanisms with higher
-   performance.
+   CoAP, the Constrained Application Protocol (RFC 7252), needs to be
+   implemented in such a way that it does not cause persistent
+   congestion on the network it uses.  The CoRE CoAP specification
+   defines basic behavior that exhibits low risk of congestion with
+   minimal implementation requirements.  It also leaves room for
+   combining the base specification with advanced congestion control
+   mechanisms with higher performance.
 
    This specification defines more advanced, but still simple CoRE
    Congestion Control mechanisms, called CoCoA.  The core of these
@@ -120,13 +120,13 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 1.  Introduction
 
-   CoAP, the Constrained Application Protocol, needs to be implemented
-   in such a way that it does not cause persistent congestion on the
-   network it uses.  The CoRE CoAP specification defines basic behavior
-   that exhibits low risk of congestion with minimal implementation
-   requirements.  It also leaves room for combining the base
-   specification with advanced congestion control mechanisms with higher
-   performance.
+   CoAP, the Constrained Application Protocol [RFC7252], needs to be
+   implemented in such a way that it does not cause persistent
+   congestion on the network it uses.  The CoRE CoAP specification
+   defines basic behavior that exhibits low risk of congestion with
+   minimal implementation requirements.  It also leaves room for
+   combining the base specification with advanced congestion control
+   mechanisms with higher performance.
 
    The present specification defines such an advanced CoRE Congestion
    Control mechanism, with the goal of improving performance while
