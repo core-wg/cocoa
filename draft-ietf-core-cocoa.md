@@ -111,7 +111,7 @@ informative:
 
 --- abstract
 
-CoAP, the Constrained Application Protocol, needs to be implemented in such a way that it does
+CoAP, the Constrained Application Protocol (RFC 7252), needs to be implemented in such a way that it does
 not cause persistent congestion on the network it uses.  The CoRE CoAP
 specification defines basic behavior that exhibits low risk of
 congestion with minimal implementation requirements.  It also leaves
@@ -134,7 +134,7 @@ real networks.
 Introduction
 ============
 
-CoAP, the Constrained Application Protocol, needs to be implemented in such a way that it does
+CoAP, the Constrained Application Protocol {{-coap}}, needs to be implemented in such a way that it does
 not cause persistent congestion on the network it uses.  The CoRE CoAP
 specification defines basic behavior that exhibits low risk of
 congestion with minimal implementation requirements.  It also leaves
