@@ -66,13 +66,11 @@ author:
         email: ilker.demirkol@entel.upc.edu
 
 normative:
-  RFC2119:
   RFC2914: ccprinciples
 #  RFC5405: udpusage
   RFC6298: tcprto
   RFC7252: coap
   RFC8085: udpusage
-  RFC8174:
 
 informative:
   RFC7641: observe
@@ -153,7 +151,7 @@ CoCoA calculates the retransmission time-out (RTO) based on RTT
 estimations with and without loss.  By taking retransmissions (in a
 potentially lossy network) into account when estimating the RTT, this
 algorithm reacts to congestion with a lower sending rate.  For
-non-confirmable packets it also limits the sending rate to 1/RTO;
+non-confirmable packets, it also limits the sending rate to 1/RTO;
 assuming that the RTO estimation in CoCoA works as expected, RTO
 should be slightly greater than the RTT, thus CoCoA would be more
 conservative than the original specification in {{-observe}}.
@@ -180,11 +178,7 @@ Initiator:
   E.g., the party that sends a confirmable message, or a
   non-confirmable message (see Section 4.3 of {{RFC7252}}) conveying a request.
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-"SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-"OPTIONAL" in this document are to be interpreted as described in
-BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they appear in all
-capitals, as shown here.
+{::boilerplate bcp14}
 
 <!-- (Note that the present document is itself informational, but it is -->
 <!-- discussing normative statements about behavior that makes the -->
@@ -232,6 +226,7 @@ of any underlying network, and therefore is well suited for a wide range of netw
 conditions, in terms of bandwidth, latency, load, loss rate, topology, etc.
 In particular, CoCoA has been found to perform well in
   scenarios with latencies ranging from the order of milliseconds to
+  peaks of
   dozens of seconds, as well as in single-hop and multihop topologies. Link
   technologies used in existing evaluation work comprise IEEE 802.15.4,
   GPRS, UMTS and Wi-Fi (see {{evidence}}). CoCoA is also expected to work
@@ -400,7 +395,7 @@ alive at least as long as this other state.
 In the absence of such other state, the RTO state SHOULD be kept at least
 long enough to avoid frequent returns to inappropriate initial values.
 For the default parameter set of Section 4.8 of {{-coap}}, it is
-strongly RECOMMENDED to be keep it for at least 255 s.
+strongly RECOMMENDED to keep it for at least 255 s.
 
 If an estimator has a value that is lower than 1 s, and it is left
 without further update for 16 times its current value, the RTO
