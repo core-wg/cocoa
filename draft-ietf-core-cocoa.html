@@ -281,7 +281,7 @@ address {
 <link href="#rfc.section.3" rel="Chapter" title="3 Area of Applicability">
 <link href="#rfc.section.4" rel="Chapter" title="4 Advanced CoAP Congestion Control: RTO Estimation">
 <link href="#rfc.section.4.1" rel="Chapter" title="4.1 Blind RTO Estimate">
-<link href="#rfc.section.4.2" rel="Chapter" title="4.2 Measured RTO Estimate">
+<link href="#rfc.section.4.2" rel="Chapter" title="4.2 Measurement-based RTO Estimate">
 <link href="#rfc.section.4.2.1" rel="Chapter" title="4.2.1 Differences with the algorithm of RFC 6298">
 <link href="#rfc.section.4.2.2" rel="Chapter" title="4.2.2 Discussion">
 <link href="#rfc.section.4.3" rel="Chapter" title="4.3 Lifetime, Aging">
@@ -308,14 +308,14 @@ address {
 <link href="#rfc.authors" rel="Chapter">
 
 
-  <meta name="generator" content="xml2rfc version 2.8.2 - https://tools.ietf.org/tools/xml2rfc" />
+  <meta name="generator" content="xml2rfc version 2.9.6 - https://tools.ietf.org/tools/xml2rfc" />
   <link rel="schema.dct" href="http://purl.org/dc/terms/" />
 
   <meta name="dct.creator" content="Bormann, C., Betzler, A., Gomez, C., and I. Demirkol" />
   <meta name="dct.identifier" content="urn:ietf:id:draft-ietf-core-cocoa-latest" />
-  <meta name="dct.issued" scheme="ISO8601" content="2017-12-21" />
-  <meta name="dct.abstract" content="The CoAP protocol needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance." />
-  <meta name="description" content="The CoAP protocol needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance." />
+  <meta name="dct.issued" scheme="ISO8601" content="2018-02-21" />
+  <meta name="dct.abstract" content="CoAP, the Constrained Application Protocol, needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance." />
+  <meta name="description" content="CoAP, the Constrained Application Protocol, needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance." />
 
 </head>
 
@@ -337,7 +337,7 @@ address {
 <td class="right">A. Betzler</td>
 </tr>
 <tr>
-<td class="left">Expires: June 24, 2018</td>
+<td class="left">Expires: August 25, 2018</td>
 <td class="right">Fundaci&#243; i2CAT</td>
 </tr>
 <tr>
@@ -354,7 +354,7 @@ address {
 </tr>
 <tr>
 <td class="left"></td>
-<td class="right">December 21, 2017</td>
+<td class="right">February 21, 2018</td>
 </tr>
 
     	
@@ -365,15 +365,15 @@ address {
   <span class="filename">draft-ietf-core-cocoa-latest</span></p>
   
   <h1 id="rfc.abstract"><a href="#rfc.abstract">Abstract</a></h1>
-<p>The CoAP protocol needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance.</p>
+<p>CoAP, the Constrained Application Protocol, needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance.</p>
 <p>This specification defines more advanced, but still simple CoRE Congestion Control mechanisms, called CoCoA.  The core of these mechanisms is a Retransmission TimeOut (RTO) algorithm that makes use of Round-Trip Time (RTT) estimates, in contrast with how the RTO is determined as per the base CoAP specification (RFC 7252). The mechanisms defined in this document have relatively low complexity, yet they improve the default CoAP RTO algorithm. The design of the mechanisms in this specification has made use of input from simulations and experiments in real networks.</p>
 <h1 id="rfc.status"><a href="#rfc.status">Status of This Memo</a></h1>
 <p>This Internet-Draft is submitted in full conformance with the provisions of BCP 78 and BCP 79.</p>
 <p>Internet-Drafts are working documents of the Internet Engineering Task Force (IETF).  Note that other groups may also distribute working documents as Internet-Drafts.  The list of current Internet-Drafts is at https://datatracker.ietf.org/drafts/current/.</p>
 <p>Internet-Drafts are draft documents valid for a maximum of six months and may be updated, replaced, or obsoleted by other documents at any time.  It is inappropriate to use Internet-Drafts as reference material or to cite them other than as "work in progress."</p>
-<p>This Internet-Draft will expire on June 24, 2018.</p>
+<p>This Internet-Draft will expire on August 25, 2018.</p>
 <h1 id="rfc.copyrightnotice"><a href="#rfc.copyrightnotice">Copyright Notice</a></h1>
-<p>Copyright (c) 2017 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
+<p>Copyright (c) 2018 IETF Trust and the persons identified as the document authors.  All rights reserved.</p>
 <p>This document is subject to BCP 78 and the IETF Trust's Legal Provisions Relating to IETF Documents (https://trustee.ietf.org/license-info) in effect on the date of publication of this document.  Please review these documents carefully, as they describe your rights and restrictions with respect to this document.  Code Components extracted from this document must include Simplified BSD License text as described in Section 4.e of the Trust Legal Provisions and are provided without warranty as described in the Simplified BSD License.</p>
 
   
@@ -393,7 +393,7 @@ address {
 </li>
 <ul><li>4.1.   <a href="#rfc.section.4.1">Blind RTO Estimate</a>
 </li>
-<li>4.2.   <a href="#rfc.section.4.2">Measured RTO Estimate</a>
+<li>4.2.   <a href="#rfc.section.4.2">Measurement-based RTO Estimate</a>
 </li>
 <ul><li>4.2.1.   <a href="#rfc.section.4.2.1">Differences with the algorithm of RFC 6298</a>
 </li>
@@ -450,9 +450,10 @@ address {
   <h1 id="rfc.section.1">
 <a href="#rfc.section.1">1.</a> <a href="#introduction" id="introduction">Introduction</a>
 </h1>
-<p id="rfc.section.1.p.1">The CoAP protocol needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance.</p>
-<p id="rfc.section.1.p.2">The present specification defines such an advanced CoRE Congestion Control mechanism, with the goal of improving performance while retaining safety as well as the simplicity that is appropriate for constrained devices.  Hence, we are calling this mechanism Simple CoCoA (Congestion Control/Advanced).</p>
-<p id="rfc.section.1.p.3">In the Internet, congestion control is typically implemented in a way that it can be introduced or upgraded unilaterally.  Still, a new congestion control scheme must not be introduced lightly.  To ensure that the new scheme is not posing a danger to the network, considerable work has been done on simulations and experiments in real networks.  Some of this work will be mentioned in &#8220;Discussion&#8221; subsections in the following sections; an overview is given in <a href="#evidence" class="xref">Appendix A</a>.  Extended rationale for this specification can also be found in the historical Internet-Drafts <a href="#I-D.bormann-core-congestion-control" class="xref">[I-D.bormann-core-congestion-control]</a> and <a href="#I-D.eggert-core-congestion-control" class="xref">[I-D.eggert-core-congestion-control]</a>, as well as in the minutes of the IETF 84 CoRE WG meetings.</p>
+<p id="rfc.section.1.p.1">CoAP, the Constrained Application Protocol, needs to be implemented in such a way that it does not cause persistent congestion on the network it uses.  The CoRE CoAP specification defines basic behavior that exhibits low risk of congestion with minimal implementation requirements.  It also leaves room for combining the base specification with advanced congestion control mechanisms with higher performance.</p>
+<p id="rfc.section.1.p.2">The present specification defines such an advanced CoRE Congestion Control mechanism, with the goal of improving performance while retaining safety as well as the simplicity that is appropriate for constrained devices.  Hence, we are calling this mechanism Simple Congestion Control/Advanced, or CoCoA for short.</p>
+<p id="rfc.section.1.p.3">CoCoA calculates the retransmission time-out (RTO) based on RTT estimations with and without loss.  By taking retransmissions (in a potentially lossy network) into account when estimating the RTT, this algorithm reacts to congestion with a lower sending rate.  For non-confirmable packets, it also limits the sending rate to 1/RTO; assuming that the RTO estimation in CoCoA works as expected, RTO should be slightly greater than the RTT, thus CoCoA would be more conservative than the original specification in <a href="#RFC7641" class="xref">[RFC7641]</a>.</p>
+<p id="rfc.section.1.p.4">In the Internet, congestion control is typically implemented in a way that it can be introduced or upgraded unilaterally.  Still, a new congestion control scheme must not be introduced lightly.  To ensure that the new scheme is not posing a danger to the network, considerable work has been done on simulations and experiments in real networks.  Some of this work will be mentioned in &#8220;Discussion&#8221; subsections in the following sections; an overview is given in <a href="#evidence" class="xref">Appendix A</a>.  Extended rationale for this specification can also be found in the historical Internet-Drafts <a href="#I-D.bormann-core-congestion-control" class="xref">[I-D.bormann-core-congestion-control]</a> and <a href="#I-D.eggert-core-congestion-control" class="xref">[I-D.eggert-core-congestion-control]</a>, as well as in the minutes of the IETF 84 CoRE WG meetings.</p>
 <h1 id="rfc.section.1.1">
 <a href="#rfc.section.1.1">1.1.</a> <a href="#terminology" id="terminology">Terminology</a>
 </h1>
@@ -463,9 +464,8 @@ address {
 <dt>Initiator:</dt>
 <dd style="margin-left: 8">The endpoint that sends the message that initiates an exchange.  E.g., the party that sends a confirmable message, or a non-confirmable message (see Section 4.3 of <a href="#RFC7252" class="xref">[RFC7252]</a>) conveying a request.</dd>
 </dl>
-<p id="rfc.section.1.1.p.3">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in BCP&#160;14 <a href="#RFC2119" class="xref">[RFC2119]</a> <a href="#RFC8174" class="xref">[RFC8174]</a> when, and only when, they appear in all capitals, as shown here.</p>
-<p id="rfc.section.1.1.p.4">(Note that the present document is itself informational, but it is discussing normative statements about behavior that makes the congestion control scheme work in a safe manner.)</p>
-<p id="rfc.section.1.1.p.5">The term &#8220;byte&#8221;, abbreviated by &#8220;B&#8221;, is used in its now customary sense as a synonym for &#8220;octet&#8221;.</p>
+<p id="rfc.section.1.1.p.3">The key words &#8220;MUST&#8221;, &#8220;MUST NOT&#8221;, &#8220;REQUIRED&#8221;, &#8220;SHALL&#8221;, &#8220;SHALL NOT&#8221;, &#8220;SHOULD&#8221;, &#8220;SHOULD NOT&#8221;, &#8220;RECOMMENDED&#8221;, &#8220;NOT RECOMMENDED&#8221;, &#8220;MAY&#8221;, and &#8220;OPTIONAL&#8221; in this document are to be interpreted as described in BCP 14 <a href="#RFC2119" class="xref">[RFC2119]</a> <a href="#RFC8174" class="xref">[RFC8174]</a> when, and only when, they appear in all capitals, as shown here.</p>
+<p id="rfc.section.1.1.p.4">The term &#8220;byte&#8221;, abbreviated by &#8220;B&#8221;, is used in its now customary sense as a synonym for &#8220;octet&#8221;.</p>
 <h1 id="rfc.section.2">
 <a href="#rfc.section.2">2.</a> <a href="#context" id="context">Context</a>
 </h1>
@@ -476,12 +476,12 @@ address {
 <h1 id="rfc.section.3">
 <a href="#rfc.section.3">3.</a> <a href="#area-of-applicability" id="area-of-applicability">Area of Applicability</a>
 </h1>
-<p id="rfc.section.3.p.1">The present algorithm is intended to be generally applicable.  The objective is to be &#8220;better&#8221; than default CoAP congestion control in a number of characteristics, including achievable goodput for a given offered load, latency, and recovery from bursts, while providing more predictable stress to the network and the same level of safety from catastrophic congestion.  The algorithm defined in this document is intended to adapt to the current characteristics of any underlying network, and therefore is well suited for a wide range of network conditions, in terms of bandwidth, latency, load, loss rate, topology, etc.  It does require three state variables per scope plus the state needed to do RTT measurements, so it may not be applicable to the most constrained devices (class 1 as per <a href="#RFC7228" class="xref">[RFC7228]</a>).</p>
+<p id="rfc.section.3.p.1">The present algorithm is intended to be generally applicable.  The objective is to be &#8220;better&#8221; than default CoAP congestion control in a number of characteristics, including achievable goodput for a given offered load, latency, and recovery from bursts, while providing more predictable stress to the network and the same level of safety from catastrophic congestion.  The algorithm defined in this document is intended to adapt to the current characteristics of any underlying network, and therefore is well suited for a wide range of network conditions, in terms of bandwidth, latency, load, loss rate, topology, etc.  In particular, CoCoA has been found to perform well in scenarios with latencies ranging from the order of milliseconds to peaks of dozens of seconds, as well as in single-hop and multihop topologies. Link technologies used in existing evaluation work comprise IEEE 802.15.4, GPRS, UMTS and Wi-Fi (see <a href="#evidence" class="xref">Appendix A</a>). CoCoA is also expected to work suitably across the general Internet.  The algorithm does require three state variables per scope plus the state needed to do RTT measurements, so it may not be applicable to the most constrained devices (say, class 1 as per <a href="#RFC7228" class="xref">[RFC7228]</a>).</p>
 <p id="rfc.section.3.p.2">The scope of each instance of the algorithm in the current set of evaluations has been the five-tuple, i.e., CoAP + endpoint (transport address) for Initiator and Responder.  Potential applicability to larger scopes needs to be examined.</p>
 <h1 id="rfc.section.4">
 <a href="#rfc.section.4">4.</a> <a href="#rto" id="rto">Advanced CoAP Congestion Control: RTO Estimation</a>
 </h1>
-<p id="rfc.section.4.p.1">For an initiator that plans to make multiple requests to one destination endpoint, it may be worthwhile to make RTT measurements in order to obtain a better RTO estimation than that implied by the default initial timeout of 2 to 3&#160;s.  In particular, a wide spectrum of RTT values is expected in different types of networks where CoAP is used.  Those RTTs range from several orders of magnitude below the default initial timeout to values larger than the default. The algorithm defined in this document is based on the algorithm for RTO estimation defined in <a href="#RFC6298" class="xref">[RFC6298]</a>, with appropriately extended default/base values, as proposed in <a href="#mod" class="xref">Section 4.2.1</a>.  Note that such a mechanism must, during idle periods, decay RTO estimates that are shorter or longer than the default RTO estimate back to the default RTO estimate, until fresh measurements become available again, as proposed in <a href="#aging" class="xref">Section 4.3</a>.</p>
+<p id="rfc.section.4.p.1">For an initiator that plans to make multiple requests to one destination endpoint, it may be worthwhile to make RTT measurements in order to compute a more appropriate RTO than the default initial timeout of 2 to 3&#160;s.  In particular, a wide spectrum of RTT values is expected in different types of networks where CoAP is used.  Those RTTs range from several orders of magnitude below the default initial timeout to values larger than the default. The algorithm defined in this document is based on the algorithm for RTO estimation defined in <a href="#RFC6298" class="xref">[RFC6298]</a>, with appropriately extended default/base values, as proposed in <a href="#mod" class="xref">Section 4.2.1</a>.  Note that such a mechanism must, during idle periods, decay RTO estimates that are shorter or longer than the default RTO estimate back to the default RTO estimate, until fresh measurements become available again, as proposed in <a href="#aging" class="xref">Section 4.3</a>.</p>
 <p id="rfc.section.4.p.2">RTT variability challenges RTO estimation. In TCP, delayed ACKs contribute to RTT variability, since this option adds a delay of up to 500 ms (typically, 200 ms) before an ACK is sent by a receiving TCP endpoint. However, one important consideration not relevant for TCP is the fact that a CoAP round-trip may include application processing time, which may be hard to predict, and may differ between different resources available at the same endpoint.  Also, for communications with networks of constrained devices that apply radio duty cycling, large and variable round-trip times are likely to be observed.  Servers will only trigger their early ACKs (with a non-piggybacked response to be sent later) based on the default timers, e.g. after 1&#160;s. A client that has arrived at a RTO estimate shorter than 1&#160;s SHOULD therefore use a larger backoff factor for retransmissions to avoid expending all of its retransmissions (MAX_RETRANSMIT, see Section 4.2 of <a href="#RFC7252" class="xref">[RFC7252]</a>, normally 4) in the default interval of 2 to 3&#160;s.  The approach chosen for a mechanism with variable backoff factors is presented in <a href="#mod" class="xref">Section 4.2.1</a>.</p>
 <p id="rfc.section.4.p.3">It may also be worthwhile to perform RTT estimation not just based on information measured from a single destination endpoint, but also based on entire hosts (IP addresses) and/or complete prefixes (e.g., maintain an RTT estimate for a whole /64).  The exact way this can be used to reduce the amount of state in an initiator is for further study.</p>
 <h1 id="rfc.section.4.1">
@@ -490,22 +490,21 @@ address {
 <p id="rfc.section.4.1.p.1">The initial RTO estimate for an endpoint is set to 2 seconds (the initial RTO estimate is used as the initial value for both E_weak_ and E_strong_ below).</p>
 <p id="rfc.section.4.1.p.2">If only the initial RTO estimate is available, the RTO estimate for each of up to NSTART exchanges started in parallel is set to 2&#160;s times the number of parallel exchanges, e.g. if two exchanges are already running, the initial RTO estimate for an additional exchange is 6&#160;seconds.</p>
 <h1 id="rfc.section.4.2">
-<a href="#rfc.section.4.2">4.2.</a> <a href="#measured-rto-estimate" id="measured-rto-estimate">Measured RTO Estimate</a>
+<a href="#rfc.section.4.2">4.2.</a> <a href="#measurement-based-rto-estimate" id="measurement-based-rto-estimate">Measurement-based RTO Estimate</a>
 </h1>
-<p id="rfc.section.4.2.p.1">The RTO estimator runs two copies of the algorithm defined in <a href="#RFC6298" class="xref">[RFC6298]</a>, with the differences introduced in <a href="#mod" class="xref">Section 4.2.1</a>: One copy for exchanges that complete on initial transmissions (the &#8220;strong estimator&#8221;, E_strong_), and one copy for exchanges that have run into retransmissions, where only the first two retransmissions are considered (the &#8220;weak estimator&#8221;, E_weak_).  For the latter, there is some ambiguity whether a response is based on the initial transmission or the retransmissions.  For the purposes of the weak estimator, the time from the initial transmission counts.  Responses obtained after the third retransmission are not used to update an estimator.</p>
+<p id="rfc.section.4.2.p.1">The RTO estimator runs two copies of the algorithm defined in <a href="#RFC6298" class="xref">[RFC6298]</a>, using the same variables and calculations to estimate the RTO, with the differences introduced in <a href="#mod" class="xref">Section 4.2.1</a>: One copy for exchanges that complete on initial transmissions (the &#8220;strong estimator&#8221;, E_strong_), and one copy for exchanges that have run into retransmissions, where only the first two retransmissions are considered (the &#8220;weak estimator&#8221;, E_weak_).  For the latter, there is some ambiguity whether a response is based on the initial transmission or the retransmissions.  For the purposes of the weak estimator, the time from the initial transmission counts.  Responses obtained after the third retransmission are not used to update an estimator.</p>
 <p id="rfc.section.4.2.p.2">The overall RTO estimate is an exponentially weighted moving average computed of the strong and the weak estimator, which is evolved after each contribution to the weak estimator (1) or to the strong estimator (2), from the estimator (either the weak or strong estimator) that made the most recent contribution:</p>
-<p></p>
+<pre>
+RTO := w_weak   * E_weak_   + (1 - w_weak)   * RTO       (1)
 
-<ul class="empty"><li>RTO := w_weak * E_weak_ + (1 - w_weak) * RTO           (1)</li></ul>
-<p></p>
-
-<ul class="empty"><li>RTO := w_strong * E_strong_ + (1 - w_strong) * RTO     (2)</li></ul>
-<p id="rfc.section.4.2.p.5">(Splitting this update into the two cases avoids making the contribution of the weak estimator too big in naturally lossy networks.)</p>
-<p id="rfc.section.4.2.p.6">The default values for the corresponding weights, w_weak and w_strong, are 0.25 and 0.5, respectively. Pseudocode and examples for the overall RTO estimate presented are available in <a href="#pseudo-rto" class="xref">Appendix B.1</a> and <a href="#examples-rto" class="xref">Appendix C.1</a>.</p>
+RTO := w_strong * E_strong_ + (1 - w_strong) * RTO       (2)
+</pre>
+<p id="rfc.section.4.2.p.3">(Splitting this update into the two cases avoids making the contribution of the weak estimator too big in naturally lossy networks.)</p>
+<p id="rfc.section.4.2.p.4">The default values for the corresponding weights, w_weak and w_strong, are 0.25 and 0.5, respectively. These values have been found to offer good performance in evaluations (see <a href="#evidence" class="xref">Appendix A</a>).  Pseudocode and examples for the overall RTO estimate presented are available in <a href="#pseudo-rto" class="xref">Appendix B.1</a> and <a href="#examples-rto" class="xref">Appendix C.1</a>.</p>
 <h1 id="rfc.section.4.2.1">
 <a href="#rfc.section.4.2.1">4.2.1.</a> <a href="#mod" id="mod">Differences with the algorithm of RFC 6298</a>
 </h1>
-<p id="rfc.section.4.2.1.p.1">This subsection presents three differences of the algorithm defined in this document with the one defined in <a href="#RFC6298" class="xref">[RFC6298]</a>.  The first two recommend new parameter settings.  The third one is the variable backoff factor mechanism.</p>
+<p id="rfc.section.4.2.1.p.1">This subsection presents three differences of the algorithm defined in this document with the one defined in <a href="#RFC6298" class="xref">[RFC6298]</a>.  The first two recommend new parameter settings.  The third one is the variable backoff factor (VBF), which replaces RFC6298&#8217;s simple exponential backoff that always multiplies the RTO by a factor of 2 when the RTO timer expires.</p>
 <p id="rfc.section.4.2.1.p.2">The initial value for each of the two RTO estimators is 2 s.</p>
 <p id="rfc.section.4.2.1.p.3">For the weak estimator, the factor K (the RTT variance multiplier) is set to 1 instead of 4.  This is necessary to avoid a strong increase of the RTO in the case that the RTTVAR value is very large, which may be the case if a weak RTT measurement is obtained after one or more retransmissions.</p>
 <p id="rfc.section.4.2.1.p.4">In order to avoid that exchanges with small initial RTOs (i.e. RTO estimate lower than 1 s) use up all retransmissions in a short interval of time, the RTO for a retransmission is multiplied by 3 for each retransmission as long as the RTO is less than 1&#160;s.</p>
@@ -515,12 +514,12 @@ address {
 <h1 id="rfc.section.4.2.2">
 <a href="#rfc.section.4.2.2">4.2.2.</a> <a href="#discussion" id="discussion">Discussion</a>
 </h1>
-<p id="rfc.section.4.2.2.p.1">In contrast to <a href="#RFC6298" class="xref">[RFC6298]</a>, this algorithm attempts to make use of ambiguous information from retransmissions.  This is motivated by the high non-congestion loss rates expected in constrained node networks, and the need to update the RTO estimators even in the presence of loss.  This approach appears to contravene the mandate in Section 3.1.1 of <a href="#RFC8085" class="xref">[RFC8085]</a> that &#8220;latency samples MUST NOT be derived from ambiguous transactions&#8221;.  However, those samples are not simply combined into the strong estimator, but are used to correct the limited knowledge that can be gained from the strong RTT measurements by employing an additional weak estimator.  In fact, the weak estimator allows to better update the RTO estimator when mostly weak RTTs are available, either due to the lossy nature of links or due to congestion-induced losses. In presence of the latter, spurious timeouts are avoided and the rate of retries is reduced, which allows to decrease congestion. Evidence that has been collected from experiments appears to support that the overall effect of using this data in the way described is beneficial (<a href="#evidence" class="xref">Appendix A</a>).</p>
+<p id="rfc.section.4.2.2.p.1">In contrast to <a href="#RFC6298" class="xref">[RFC6298]</a>, this algorithm attempts to make use of ambiguous information from retransmissions.  This is motivated by the high non-congestion loss rates expected in constrained node networks, and the need to update the RTO estimators even in the presence of loss.  This approach appears to contravene the mandate in Section 3.1.1 of <a href="#RFC8085" class="xref">[RFC8085]</a> that &#8220;latency samples MUST NOT be derived from ambiguous transactions&#8221;.  However, those samples are not simply combined into the strong estimator, but are used to correct the limited knowledge that can be gained from the strong RTT measurements by employing an additional weak estimator.  In fact, the weak estimator allows to better update the RTO estimator when mostly weak RTTs are available, either due to the lossy nature of links or due to congestion-induced losses. In the presence of the latter, and compared to a strong-only estimator (w_weak=0), spurious timeouts are avoided and the rate of retries is reduced, which allows to decrease congestion. Evidence that has been collected from experiments appears to support that the overall effect of using this data in the way described is beneficial (<a href="#evidence" class="xref">Appendix A</a>).</p>
 <p id="rfc.section.4.2.2.p.2">Some evaluation has been done on earlier versions of this specification <a href="#Betzler2013" class="xref">[Betzler2013]</a>.  A more recent (and more comprehensive) reference is <a href="#Betzler2015" class="xref">[Betzler2015]</a>.</p>
 <h1 id="rfc.section.4.3">
 <a href="#rfc.section.4.3">4.3.</a> <a href="#aging" id="aging">Lifetime, Aging</a>
 </h1>
-<p id="rfc.section.4.3.p.1">The state of the RTO estimators for an endpoint SHOULD be kept as long as possible.  If other state is kept for the endpoint (such as a DTLS connection), it is very strongly RECOMMENDED to keep the RTO state alive at least as long as this other state.  It MUST be kept for at least 255&#160;s.</p>
+<p id="rfc.section.4.3.p.1">The state of the RTO estimators for an endpoint SHOULD be kept as long as possible.  If other state is kept for the endpoint (such as a DTLS connection), it is very strongly RECOMMENDED to keep the RTO state alive at least as long as this other state.  In the absence of such other state, the RTO state SHOULD be kept at least long enough to avoid frequent returns to inappropriate initial values.  For the default parameter set of Section 4.8 of <a href="#RFC7252" class="xref">[RFC7252]</a>, it is strongly RECOMMENDED to keep it for at least 255&#160;s.</p>
 <p id="rfc.section.4.3.p.2">If an estimator has a value that is lower than 1 s, and it is left without further update for 16 times its current value, the RTO estimate is doubled.  If an estimator has a value that is higher than 3 s, and it is left without further update for 4 times its current value, the RTO estimate is set to be</p>
 <p></p>
 
