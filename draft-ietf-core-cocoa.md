@@ -67,6 +67,7 @@ author:
 
 normative:
   RFC2914: ccprinciples
+  RFC5033: altcc
 #  RFC5405: udpusage
   RFC6298: tcprto
   RFC7252: coap
@@ -112,8 +113,8 @@ informative:
 --- abstract
 
 CoAP, the Constrained Application Protocol (RFC 7252), needs to be implemented in such a way that it does
-not cause persistent congestion on the network it uses.  The CoRE CoAP
-specification defines basic behavior that exhibits low risk of
+not cause persistent congestion on the network it uses.  The base CoAP
+specification (RFC 7252) defines basic behavior that exhibits low risk of
 congestion with minimal implementation requirements.  It also leaves
 room for combining the base specification with advanced congestion
 control mechanisms with higher performance.
@@ -122,7 +123,7 @@ This specification defines more advanced, but still simple CoRE
 Congestion Control mechanisms, called CoCoA.  The core of these
 mechanisms is a Retransmission TimeOut (RTO) algorithm that makes use of
 Round-Trip Time (RTT) estimates, in contrast with how the RTO is
-determined as per the base CoAP specification (RFC 7252). The mechanisms
+determined as per the base CoAP specification. The mechanisms
 defined in this document have relatively low complexity, yet they improve
 the default CoAP RTO algorithm. The design of the mechanisms in this
 specification has made use of input from simulations and experiments in
@@ -135,37 +136,42 @@ Introduction
 ============
 
 CoAP, the Constrained Application Protocol {{-coap}}, needs to be implemented in such a way that it does
-not cause persistent congestion on the network it uses.  The CoRE CoAP
-specification defines basic behavior that exhibits low risk of
+not cause persistent congestion on the network it uses.  The base CoAP
+specification [RFC7252] defines basic behavior that exhibits low risk of
 congestion with minimal implementation requirements.  It also leaves
 room for combining the base specification with advanced congestion
 control mechanisms with higher performance.
 
-The present specification defines such an advanced CoRE Congestion
+This specification defines such an advanced CoRE Congestion
 Control mechanism, with the goal of improving performance while
 retaining safety as well as the simplicity that is appropriate for
 constrained devices.  Hence, we are calling this mechanism Simple
 Congestion Control/Advanced, or CoCoA for short.
 
 CoCoA calculates the retransmission time-out (RTO) based on RTT
-estimations with and without loss.  By taking retransmissions (in a
+estimations with and without loss; it averages recent measured RTT samples to
+account for variance using an exponentially weighted moving average {{-udpusage}}. 
+By taking retransmissions (in a
 potentially lossy network) into account when estimating the RTT, this
 algorithm reacts to congestion with a lower sending rate.  For
-non-confirmable packets, it also limits the sending rate to 1/RTO;
+non-confirmable packets {{-coap}}, it also limits the sending rate to 1/RTO;
 assuming that the RTO estimation in CoCoA works as expected, RTO
 should be slightly greater than the RTT, thus CoCoA would be more
-conservative than the original specification in {{-observe}}.
+conservative than the original specification in {{-observe}}. 
 
 In the Internet, congestion control is typically implemented in a way
 that it can be introduced or upgraded unilaterally.  Still, a new
-congestion control scheme must not be introduced lightly.  To ensure
-that the new scheme is not posing a danger to the network,
+congestion control scheme must not be introduced lightly.  To support that
+the new scheme has low risk of posing a danger to the network,
 considerable work has been done on simulations and experiments in real
 networks.  Some of this work will be mentioned in "Discussion" subsections in
 the following sections; an overview is given in {{evidence}}.
 Extended rationale for this specification can also be found in the
 historical Internet-Drafts {{-bormann}} and {{-eggert}}, as well as in
-the minutes of the IETF 84 CoRE WG meetings.
+the minutes of the IETF 84 CoRE WG meetings. Note that while CoCoA has been 
+designed taking into account the guidelines of {{?RFC5033}}, it targets 
+a different use case from the one considered in {{?RFC5033}}.
+
 
 Terminology
 -----------
@@ -177,6 +183,10 @@ Initiator:
 : The endpoint that sends the message that initiates an exchange.
   E.g., the party that sends a confirmable message, or a
   non-confirmable message (see Section 4.3 of {{RFC7252}}) conveying a request.
+  
+Responder:
+: The endpoint that sends a message in response to a message sent by an Initiator.
+  E.g., the party that sends a message conveying a response.
 
 {::boilerplate bcp14}
 
@@ -190,12 +200,12 @@ sense as a synonym for "octet".
 Context
 =====
 
-In the definition of the CoAP protocol {{-coap}}, an approach was
+In the definition of the CoAP protocol, an approach was
 taken that includes a very simple basic scheme (lock-step with the
 number of parallel exchanges usually limited to 1) in the base
-specification together with performance-enhancing advanced mechanisms.
+specification {{-coap}} together with performance-enhancing advanced mechanisms.
 
-The present specification is based on the approved text in the
+This specification is based on the
 {{-coap}} base specification.  It is making use of the text that
 permits advanced congestion control mechanisms and allows them to
 change protocol parameters, including NSTART and the binary
@@ -203,20 +213,20 @@ exponential backoff mechanism.  Note that Section 4.8 of {{-coap}}
 limits the leeway that implementations have in changing the CoRE
 protocol parameters.
 
-The present specification also assumes that, outside of exchanges,
+This specification also assumes that, outside of exchanges,
 non-confirmable messages can only be used at a limited rate without an
 advanced congestion control mechanism (this is mainly relevant for
 {{-observe}}).  It is also intended to address the {{-udpusage}} guideline
 about combining congestion control state for a destination; and to
 clarify its meaning for CoAP using the definition of an endpoint.
 
-The present specification does not address multicast or dithering
+This specification does not address multicast or dithering
 beyond basic retransmission dithering.
 
 Area of Applicability
 =====================
 
-The present algorithm is intended to be generally applicable.
+The algorithm defined in this document is intended to be generally applicable.
 The objective is to be "better" than default CoAP congestion control
 in a number of characteristics, including achievable goodput for a
 given offered load, latency, and recovery from bursts, while providing more predictable
@@ -227,7 +237,11 @@ conditions, in terms of bandwidth, latency, load, loss rate, topology, etc.
 In particular, CoCoA has been found to perform well in
   scenarios with latencies ranging from the order of milliseconds to
   peaks of
-  dozens of seconds, as well as in single-hop and multihop topologies. Link
+  dozens of seconds, as well as in single-hop and multihop topologies (note: "latency"
+  includes all delay components since a message transmission is requested by the CoAP
+  entity at the sender until the message is received at the destination endpoint, which may 
+  comprise processing, medium access, transmission, buffering, forwarding and 
+  propagation, among others). Link
   technologies used in existing evaluation work comprise IEEE 802.15.4,
   GPRS, UMTS and Wi-Fi (see {{evidence}}). CoCoA is also expected to work
   suitably across the general Internet.  The algorithm
@@ -243,17 +257,17 @@ larger scopes needs to be examined.
 Advanced CoAP Congestion Control: RTO Estimation {#rto}
 ================================================
 
-For an initiator that plans to make multiple requests to one
-destination endpoint, it may be worthwhile to make RTT measurements in
+An initiator that plans to make multiple requests to one
+destination endpoint, can benefit from making RTT measurements in
 order to compute a more appropriate RTO than the
-default initial timeout of 2 to 3 s.  In particular, a wide spectrum
-of RTT values is expected in different types of networks where CoAP is used.
+default initial timeout of 2 to 3 s.  This is expected to improve
+performance across the wide range of RTT values that may be expected
+across the types of networks where CoAP is used.
 Those RTTs range from several orders of magnitude below the default initial
 timeout to values larger than the default. The algorithm defined in this document
 is based on the algorithm for RTO estimation defined in {{RFC6298}}, with appropriately
 extended default/base values, as proposed in {{mod}}.  Note that
-such a mechanism must, during idle periods, decay RTO estimates that
-are shorter or longer than the default RTO estimate back to the default RTO
+such a mechanism must, during idle periods, decay RTO estimates back to the default RTO
 estimate, until fresh measurements become available again, as proposed
 in {{aging}}.
 
@@ -270,7 +284,7 @@ likely to be observed.
 Servers will only trigger their early ACKs (with a
 non-piggybacked response to be sent later) based on the default
 timers, e.g. after 1 s. A client that has arrived at a RTO estimate
-shorter than 1 s SHOULD therefore use a larger backoff factor for
+shorter than 1 s should therefore use a larger backoff factor for
 retransmissions to avoid expending all of its retransmissions
 (MAX_RETRANSMIT, see Section 4.2 of {{RFC7252}}, normally 4) in the default interval of 2 to 3 s.
 The approach chosen for a mechanism with variable
@@ -280,8 +294,11 @@ It may also be worthwhile to perform RTT estimation not just based on
 information measured from a single destination endpoint, but also
 based on entire hosts (IP addresses) and/or complete prefixes (e.g.,
 maintain an RTT estimate for a whole /64).  The exact way this can be
-used to reduce the amount of state in an initiator is for further
-study.
+used to reduce the amount of state in an initiator, and the potential 
+performance issues involved, is for further study.  Note that using information measured from 
+a set of destination hosts involves the risk of performance issues if the RTT characteristics
+for the different hosts vary significantly. For example, the estimated RTO may be suitable
+for one destination endpoint, but it may be too short for a more distant endpoint. 
 
 ## Blind RTO Estimate
 
@@ -306,7 +323,7 @@ considered (the "weak estimator", E_weak_).  For the latter, there is some
 ambiguity whether a response is based on the initial transmission or
 the retransmissions.  For the purposes of the weak estimator, the time
 from the initial transmission counts.  Responses obtained after the third retransmission are
-not used to update an estimator.
+not used to update the weak estimator.
 
 
 The overall RTO estimate is an exponentially weighted moving average
@@ -338,7 +355,7 @@ backoff factor (VBF), which replaces RFC6298's simple exponential
 backoff that always multiplies the RTO by a factor of 2 when the RTO
 timer expires.
 
-The initial value for each of the two RTO estimators is 2 s.
+The initial value for each of the two RTO estimators (the weak and the strong estimator) is 2 s.
 
 For the weak estimator, the factor K (the RTT variance multiplier) is
 set to 1 instead of 4.  This is necessary to avoid a strong increase
@@ -346,12 +363,12 @@ of the RTO in the case that the RTTVAR value is very large, which may
 be the case if a weak RTT measurement is obtained after one or more
 retransmissions.
 
-In order to avoid that exchanges with small initial RTOs (i.e. RTO estimate lower
+In order to avoid that exchanges with small RTOs (i.e. RTO estimate lower
 than 1 s) use up all retransmissions in a short interval of time, the RTO for
 a retransmission is multiplied by 3 for each retransmission as long as
 the RTO is less than 1 s.
 
-On the other hand, to avoid exchanges with large initial RTOs
+On the other hand, to avoid exchanges with large RTOs
 (i.e., RTO estimate greater than 3 s) not being able to carry out all
 retransmissions within MAX_TRANSMIT_WAIT (normally 93 s), the RTO is
 multiplied only by 1.5 when RTO is greater than 3 s.
@@ -367,7 +384,7 @@ are dithered between 1 x RTO and ACK\_RANDOM\_FACTOR x RTO.
 In contrast to {{RFC6298}}, this algorithm attempts to make use of
 ambiguous information from retransmissions.  This is motivated by the
 high non-congestion loss rates expected in constrained node networks,
-and the need to update the RTO estimators even in the presence of
+and the need to update the RTO estimator even in the presence of
 loss.  This approach appears to contravene the mandate in Section
 3.1.1 of {{-udpusage}} that "latency samples MUST NOT be derived from
 ambiguous transactions".  However, those samples are not simply
@@ -376,7 +393,7 @@ limited knowledge that can be gained from the strong RTT measurements
 by employing an additional weak estimator.  In fact, the weak estimator
 allows to better update the RTO estimator when mostly weak RTTs are
 available, either due to the lossy nature of links or due to congestion-induced
-losses. In the presence of the latter, and compared to a strong-only estimator (w_weak=0),
+losses. In the presence of the latter, and compared to a strong-only RTO estimator (w_weak=0),
 spurious timeouts are avoided and the rate
 of retries is reduced, which allows to decrease congestion. Evidence that has
 been collected from experiments appears to support that the overall effect
@@ -388,7 +405,7 @@ reference is {{Betzler2015}}.
 
 ## Lifetime, Aging {#aging}
 
-The state of the RTO estimators for an endpoint SHOULD be kept as long
+The RTO state for an endpoint SHOULD be kept as long
 as possible.  If other state is kept for the endpoint (such as a DTLS
 connection), it is very strongly RECOMMENDED to keep the RTO state
 alive at least as long as this other state.
@@ -397,17 +414,22 @@ long enough to avoid frequent returns to inappropriate initial values.
 For the default parameter set of Section 4.8 of {{-coap}}, it is
 strongly RECOMMENDED to keep it for at least 255 s.
 
-If an estimator has a value that is lower than 1 s, and it is left
-without further update for 16 times its current value, the RTO
-estimate is doubled.
-If an estimator has a value that is higher than 3 s, and it is left
-without further update for 4 times its current value, the RTO estimate
-is set to be
+In order to avoid using potentially obsolete RTO estimates after idle periods 
+without RTO updates, this document defines an RTO aging mechanism. This mechanism, 
+intended for a sender in an idle period, operates as follows.
+If an RTO estimator has a value that is lower than LOW_AGING_RTO_THRESH, and it is left
+without further update for LOW_AGING_RTO_FACTOR times its current value, the RTO
+estimate MUST be doubled. The default values for LOW_AGING_RTO_THRESH and LOW_AGING_RTO_FACTOR
+are 1 s and 16, respectively.
+If an RTO estimator has a value that is higher than HIGH_AGING_RTO_THRESH, and it is left
+without further update for HIGH_AGING_RTO_FACTOR times its current value, the RTO estimate
+MUST be
 
 >   RTO := 1 s + (0.5 * RTO)
 
+The default values for HIGH_AGING_RTO_THRESH and HIGH_AGING_RTO_FACTOR are 3 s and 4, respectively.
 (Note that, instead of running a timer, it is possible to implement
-these RTO aging calculations cumulatively at the time the estimator is used next.)
+these RTO aging calculations cumulatively at the time the RTO estimator is used next.)
 
 Pseudocode and examples for the aging mechanism presented are available in {{pseudo-aging}}
 and in {{examples-aging}}.
@@ -415,9 +437,9 @@ and in {{examples-aging}}.
 Advanced CoAP Congestion Control: Non-Confirmables
 ==================================================
 
-A CoAP endpoint MUST NOT send non-confirmables to another CoAP endpoint
+An endpoint MUST NOT send non-confirmables [RFC7252] to another endpoint
 at a rate higher than defined by this document.
-Independent of any congestion control mechanisms, a CoAP endpoint can
+Independent of any congestion control mechanisms, an endpoint can
 always send non-confirmables if their rate does not exceed 1 B/s.
 
 Non-confirmables that form part of exchanges are governed by the rules
@@ -460,9 +482,11 @@ This document makes no requirements on IANA.
 Security Considerations
 =======================
 
-The security considerations of, e.g., {{?RFC5681}},
+The security considerations of {{?RFC5681}},
 {{RFC2914}}, and {{-udpusage}} apply.  Some issues are already discussed
-in the security considerations of {{-coap}}.
+in the security considerations of {{-coap}}.  In particular, section 11.3 of {{-coap}} discusses
+amplification techniques that may be used by an attacker, and mitigation approaches. Amplification
+may induce network congestion, since it increases the utilization of transmission resources.  
 
 If a malicious node manages to prevent the delivery of some packets, a consequence will be an RTO
 increase, which will further reduce network performance. Note that this type
@@ -475,6 +499,17 @@ Also, the weak estimator in CoCoA increases the chances of obtaining
 RTT measurements in the presence of heavy packet losses, allowing to keep
 the RTO updated, which in turn allows recovery from a jamming attack in
 reasonable time.
+
+Another attack relies on making the sender unresponsive to congestion
+signals. For example, during a highly congested interval, CON messages or the
+corresponding ACKs may be lost. However, an attacker may manage to transmit 
+spoofed ACKs in response to CON messages during congestion intervals. In that
+case, the sender message rate will not decrease, thereby not alleviating 
+network congestion. The cost of this attack is linear with the number of 
+CON messages transmitted by Initiators during a congested interval. Possible 
+mitigation includes network access control. 
+
+ 
 
 
 --- back
