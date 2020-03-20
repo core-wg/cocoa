@@ -5,11 +5,11 @@
 CoRE Working Group                                            C. Bormann
 Internet-Draft                                   Universitaet Bremen TZI
 Intended status: Informational                                A. Betzler
-Expires: August 25, 2018                                  Fundacio i2CAT
+Expires: September 21, 2020                               Fundacio i2CAT
                                                                 C. Gomez
                                                              I. Demirkol
                      Universitat Politecnica de Catalunya/Fundacio i2CAT
-                                                       February 21, 2018
+                                                          March 20, 2020
 
 
                 CoAP Simple Congestion Control/Advanced
@@ -53,16 +53,16 @@ Status of This Memo
 
 
 
-Bormann, et al.          Expires August 25, 2018                [Page 1]
+Bormann, et al.        Expires September 21, 2020               [Page 1]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
-   This Internet-Draft will expire on August 25, 2018.
+   This Internet-Draft will expire on September 21, 2020.
 
 Copyright Notice
 
-   Copyright (c) 2018 IETF Trust and the persons identified as the
+   Copyright (c) 2020 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -109,9 +109,9 @@ Table of Contents
 
 
 
-Bormann, et al.          Expires August 25, 2018                [Page 2]
+Bormann, et al.        Expires September 21, 2020               [Page 2]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
                 estimators . . . . . . . . . . . . . . . . . . . . .  16
@@ -165,9 +165,9 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 25, 2018                [Page 3]
+Bormann, et al.        Expires September 21, 2020               [Page 3]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
    Initiator:  The endpoint that sends the message that initiates an
@@ -177,8 +177,8 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
    The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
    "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
-   "OPTIONAL" in this document are to be interpreted as described in BCP
-   14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
    capitals, as shown here.
 
    The term "byte", abbreviated by "B", is used in its now customary
@@ -221,9 +221,9 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 25, 2018                [Page 4]
+Bormann, et al.        Expires September 21, 2020               [Page 4]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
    intended to adapt to the current characteristics of any underlying
@@ -277,9 +277,9 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 25, 2018                [Page 5]
+Bormann, et al.        Expires September 21, 2020               [Page 5]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
    (MAX_RETRANSMIT, see Section 4.2 of [RFC7252], normally 4) in the
@@ -333,9 +333,9 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 25, 2018                [Page 6]
+Bormann, et al.        Expires September 21, 2020               [Page 6]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
    (Splitting this update into the two cases avoids making the
@@ -389,9 +389,9 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 25, 2018                [Page 7]
+Bormann, et al.        Expires September 21, 2020               [Page 7]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
    and the need to update the RTO estimators even in the presence of
@@ -445,9 +445,9 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 25, 2018                [Page 8]
+Bormann, et al.        Expires September 21, 2020               [Page 8]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
 5.  Advanced CoAP Congestion Control: Non-Confirmables
@@ -501,9 +501,9 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 25, 2018                [Page 9]
+Bormann, et al.        Expires September 21, 2020               [Page 9]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
 7.  Security Considerations
@@ -557,9 +557,9 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 25, 2018               [Page 10]
+Bormann, et al.        Expires September 21, 2020              [Page 10]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
 8.2.  Informative References
@@ -613,9 +613,9 @@ Appendix A.  Supporting evidence
 
 
 
-Bormann, et al.          Expires August 25, 2018               [Page 11]
+Bormann, et al.        Expires September 21, 2020              [Page 11]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
    CoCoA has been evaluated by means of simulation and experimentation
@@ -669,9 +669,9 @@ A.2.  References
 
 
 
-Bormann, et al.          Expires August 25, 2018               [Page 12]
+Bormann, et al.        Expires September 21, 2020              [Page 12]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
    [4] A.  Betzler, J.  Isern, C.  Gomez, I.  Demirkol, J.  Paradells,
@@ -725,9 +725,9 @@ B.1.  Updating the RTO estimator
 
 
 
-Bormann, et al.          Expires August 25, 2018               [Page 13]
+Bormann, et al.        Expires September 21, 2020              [Page 13]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
    // Default values
@@ -781,9 +781,9 @@ B.3.  Variable Backoff Factor
 
 
 
-Bormann, et al.          Expires August 25, 2018               [Page 14]
+Bormann, et al.        Expires September 21, 2020              [Page 14]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
 Appendix C.  Examples
@@ -837,9 +837,9 @@ C.2.  Example A.2: VBF and aging
 
 
 
-Bormann, et al.          Expires August 25, 2018               [Page 15]
+Bormann, et al.        Expires September 21, 2020              [Page 15]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
    (with an RTO of 4 s, after 16 s the RTO would be shifted to 3 s
@@ -893,9 +893,9 @@ Appendix D.  Analysis: difference between strong and weak estimators
 
 
 
-Bormann, et al.          Expires August 25, 2018               [Page 16]
+Bormann, et al.        Expires September 21, 2020              [Page 16]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
 Acknowledgements
@@ -949,9 +949,9 @@ Authors' Addresses
 
 
 
-Bormann, et al.          Expires August 25, 2018               [Page 17]
+Bormann, et al.        Expires September 21, 2020              [Page 17]
 
-Internet-Draft              CoAP Simple CoCoA              February 2018
+Internet-Draft              CoAP Simple CoCoA                 March 2020
 
 
    Carles Gomez
@@ -1005,4 +1005,4 @@ Internet-Draft              CoAP Simple CoCoA              February 2018
 
 
 
-Bormann, et al.          Expires August 25, 2018               [Page 18]
+Bormann, et al.        Expires September 21, 2020              [Page 18]
