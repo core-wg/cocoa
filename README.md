@@ -20,5 +20,4 @@ This requires that you have the necessary software installed.  See
 
 ## Contributing
 
-See the
-[guidelines for contributions](https://github.com/core-wg/cocoa/blob/master/CONTRIBUTING.md).
+See the [guidelines for contributions](https://github.com/core-wg/cocoa/blob/master/CONTRIBUTING.md).
